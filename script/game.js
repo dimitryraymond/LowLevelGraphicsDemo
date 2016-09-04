@@ -102,61 +102,6 @@ var Canvas = function(canvasId){
   this.ctx.fillStyle = this.defaultFillStyle;
   this.ctx.strokeStyle = this.defaultStrokeStyle;
 
-  // this.drawLine = function(x1, y1, x2, y2, color){
-  //   this.ctx.beginPath();
-  //   this.ctx.moveTo(x1, y1);
-  //   this.ctx.lineTo(x2, y2);
-  //   if(color != null){
-  //     this.ctx.strokeStyle = color;
-  //     this.ctx.stroke();
-  //     this.ctx.strokeStyle = this.defaultStrokeStyle;
-  //   }
-  //   else
-  //   {
-  //     this.ctx.stroke();
-  //   }
-  //   this.ctx.closePath();
-  // }
-  //
-  // this.drawCircle = function(x, y, radius, color){
-  //   this.ctx.beginPath();
-  //   this.ctx.arc(x, y, radius, 0, 2*Math.PI);
-  //   if(color != null){
-  //     this.ctx.strokeStyle = color;
-  //     this.ctx.stroke();
-  //     this.ctx.strokeStyle = this.defaultStrokeStyle;
-  //   }
-  //   else
-  //   {
-  //     this.ctx.stroke();
-  //   }
-  //   this.ctx.closePath();
-  // }
-  //
-  // this.drawText = function(text, x, y, color){
-  //   if(color != null){
-  //     this.ctx.fillStyle = color;
-  //     this.ctx.fillText(text, x, y);
-  //     this.ctx.fillStyle = this.defaultFillStyle;
-  //   }
-  //   else
-  //   {
-  //     this.ctx.fillText(text, x, y);
-  //   }
-  // }
-  //
-  // this.drawRect = function(x, y, width, height, color){
-  //   if(color != null){
-  //     this.ctx.fillStyle = color;
-  //     this.ctx.fillRect(x, y, width, height);
-  //     this.ctx.fillStyle = this.defaultFillStyle;
-  //   }
-  //   else
-  //   {
-  //     this.ctx.fillRect(x, y, width, height);
-  //   }
-  // }
-
   this.draw3DPolygon = function(polygon){
     if(this.camera.polygonInView(polygon)){
       this.ctx.beginPath();
