@@ -4,6 +4,11 @@ var Vertex = function(x, y, z){
   this.z = z;
 }
 
+var Polygon = function(vertices, color){
+  this.vertices = vertices;
+  this.color = color;
+}
+
 var Vector = function(x, y, z){
   if(x == 0 && y == 0 && z == 0){
     throw "One of the coords must be non-zero";
@@ -18,10 +23,6 @@ var Vector = function(x, y, z){
     return Math.sqrt(this.x * this.x + this.y * this.y + this.z * this.z);
   }
 
-  this.getHorizontalAngle = function(){
-    return
-  }
-
   this.normalize = function(){
     var tX = this.x / this.length();
     var tY = this.y / this.length();
@@ -32,10 +33,10 @@ var Vector = function(x, y, z){
     this.z = tZ;
   }
 
-  this.rotateHorizontally = function(unit){
-    var tempX = Math.cos(unit) * this.x - Math.sin(unit) * this.z;
+  this.rotateHorizontally = function(radians){
+    var tempX = Math.cos(radians) * this.x - Math.sin(radians) * this.z;
     var tempY = this.y;
-    var tempZ = Math.sin(unit) * this.x + Math.cos(unit) * this.z;
+    var tempZ = Math.sin(radians) * this.x + Math.cos(radians) * this.z;
 
     this.x = tempX;
     this.y = tempY;
@@ -56,13 +57,14 @@ var Camera = function(vector, viewportSize, zoom){
   this.cashedVertices = [];
 
   this.polygonInView = function(polygon){
-    //clear cache before this polygon
+    //clear cache before this polygon gets processed
     this.cashedVertices = [];
 
-    var sin = this.vector.x / this.vector.length();
-    var cos = this.vector.z / this.vector.length();
+    var tLength = this.vector.length();
+    var sin = this.vector.x / tLength;
+    var cos = this.vector.z / tLength;
 
-    var anyOnScreen = false;
+    var anyVertexVisible = false;
     for(var i = 0; i < polygon.vertices.length; i++){
       var point = polygon.vertices[i];
 
@@ -76,21 +78,16 @@ var Camera = function(vector, viewportSize, zoom){
 
       this.cashedVertices.push([x, -y]);
 
-      //tZ > 0 can shortcircuit and make this faster sice it generates a subset of the desired results
+      //tZ > ... can shortcircuit and make this faster since it generates a subset of the desired results
       //it checks if the vertex z coord is in front of the camera
       if(tZ > this.zOverflowThreshold ||
         (x >= -this.viewportSize[0] / 2 && x <= this.viewportSize[0] / 2 &&
          y >= -this.viewportSize[1] / 2 && y <= this.viewportSize[1] / 2)){
-        anyOnScreen = true;
+        anyVertexVisible = true;
       }
     }
-    return anyOnScreen;
+    return anyVertexVisible;
   }
-}
-
-var Polygon = function(vertices, color){
-  this.vertices = vertices;
-  this.color = color;
 }
 
 var Canvas = function(canvasId){
