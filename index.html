@@ -8,6 +8,45 @@
 <body>
 
   <canvas id='myCanvas' width="1000" height="500">no canvas?</canvas>
-  <script src="script/game.js" /></script>
+  <script src="script/engine.js" /></script>
+  <script>
+    
+    var myCanvas = new Canvas('myCanvas');
+
+    function displayRow(item, index, array){
+      var y = item;
+      for(var i = -5; i < 5; i++){
+        for(var z = -5; z < 5; z++){
+          var polygon = new Polygon([new Vertex(i * 100, y, z * 100),
+            new Vertex((i + 1) * 100, y, z * 100),
+            new Vertex((i + 1) * 100, y, (z + 1) * 100),
+            new Vertex(i * 100, y, (z + 1) * 100)]);
+          if((i + z) % 2 == 0)
+            polygon.color = 'red';
+          else
+            polygon.color = 'black';
+          myCanvas.draw3DPolygon(polygon);
+        }
+      }
+    }
+
+    function render(){
+      myCanvas.clearScreen();
+      [-250, 50].forEach(displayRow);
+    }
+
+    document.addEventListener('keydown', function(event) {
+        if(event.keyCode == 37) {
+            myCanvas.camera.vector.rotateHorizontally(Math.PI / 16);
+            render();
+        }
+        else if(event.keyCode == 39) {
+            myCanvas.camera.vector.rotateHorizontally(- Math.PI / 16);
+            render();
+        }
+    });
+
+    render();
+  </script>
 </body>
 </html>
