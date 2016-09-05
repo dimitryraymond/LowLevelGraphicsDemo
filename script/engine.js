@@ -2,6 +2,12 @@ var Vertex = function(x, y, z){
   this.x = x;
   this.y = y;
   this.z = z;
+
+  this.add = function(vertex){
+    this.x += vertex.x;
+    this.y += vertex.y;
+    this.z += vertex.z;
+  }
 }
 
 var Polygon = function(vertices, color){
@@ -33,6 +39,7 @@ var Vector = function(x, y, z){
     this.z = tZ;
   }
 
+  //rotate horizontally left
   this.rotateHorizontally = function(radians){
     var tempX = Math.cos(radians) * this.x - Math.sin(radians) * this.z;
     var tempY = this.y;
@@ -42,9 +49,18 @@ var Vector = function(x, y, z){
     this.y = tempY;
     this.z = tempZ;
   }
+
+  this.getScaled = function(scallar){
+    return new Vector(this.x * scallar, this.y * scallar, this.z * scallar);
+  }
+
+  this.toVertex = function(){
+    return new Vertex(x, y, z);
+  }
 }
 
-var Camera = function(vector, viewportSize, zoom){
+var Camera = function(position, vector, viewportSize, zoom){
+  this.position = position;
   this.vector = vector;
   this.viewportSize = viewportSize;
   this.zoom = zoom;
@@ -94,7 +110,7 @@ var Canvas = function(canvasId){
   this.canvas = document.getElementById(canvasId);
   this.ctx = this.canvas.getContext("2d");
   this.zoom = 600;
-  this.camera = new Camera(new Vector(0, 0, 1), [this.canvas.width, this.canvas.height], this.zoom);
+  this.camera = new Camera(new Vertex(0, 0, 0), new Vector(0, 0, 1), [this.canvas.width, this.canvas.height], this.zoom);
   this.defaultFillStyle = 'black';
   this.defaultStrokeStyle = 'black';
   this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);

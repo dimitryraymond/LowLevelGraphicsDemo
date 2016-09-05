@@ -10,7 +10,7 @@
   <canvas id='myCanvas' width="1000" height="500">no canvas?</canvas>
   <script src="script/engine.js" /></script>
   <script>
-    
+
     var myCanvas = new Canvas('myCanvas');
 
     function displayRow(item, index, array){
@@ -35,14 +35,28 @@
       [-250, 50].forEach(displayRow);
     }
 
+    var speed = 50;
     document.addEventListener('keydown', function(event) {
-        if(event.keyCode == 37) {
-            myCanvas.camera.vector.rotateHorizontally(Math.PI / 16);
-            render();
+        if(event.keyCode == 68) { // if d
+          myCanvas.camera.vector.rotateHorizontally(-Math.PI / 16);
+          console.log(myCanvas.camera.vector);
+          render();
         }
-        else if(event.keyCode == 39) {
-            myCanvas.camera.vector.rotateHorizontally(- Math.PI / 16);
-            render();
+        else if(event.keyCode == 65) { // if a
+          myCanvas.camera.vector.rotateHorizontally(Math.PI / 16);
+          console.log(myCanvas.camera.vector);
+          render();
+        }
+        else if(event.keyCode == 87){ // if w
+          myCanvas.camera.position.add(myCanvas.camera.vector.getScaled(speed).toVertex());
+          console.log(myCanvas.camera.position);
+        }
+        else if(event.keyCode == 83){ // if s
+          myCanvas.camera.position.add(myCanvas.camera.vector.getScaled(-speed).toVertex());
+          console.log(myCanvas.camera.position);
+        }
+        else{
+          // alert(event.keyCode);
         }
     });
 
