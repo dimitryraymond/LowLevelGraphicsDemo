@@ -40,12 +40,10 @@
         if(event.keyCode == 68) { // if d
           myCanvas.camera.vector.rotateHorizontally(-Math.PI / 16);
           console.log(myCanvas.camera.vector);
-          render();
         }
         else if(event.keyCode == 65) { // if a
           myCanvas.camera.vector.rotateHorizontally(Math.PI / 16);
           console.log(myCanvas.camera.vector);
-          render();
         }
         else if(event.keyCode == 87){ // if w
           myCanvas.camera.position.add(myCanvas.camera.vector.getScaled(speed).toVertex());
@@ -58,6 +56,7 @@
         else{
           // alert(event.keyCode);
         }
+        render();
     });
 
     render();

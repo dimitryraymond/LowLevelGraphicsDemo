@@ -64,7 +64,7 @@ var Camera = function(position, vector, viewportSize, zoom){
   this.vector = vector;
   this.viewportSize = viewportSize;
   this.zoom = zoom;
-  this.zOverflowThreshold = -100;
+  this.zOverflowThreshold = 0;
   if(this.vector.y != 0){
     throw "Rotation only around Y axis is implemented so, only horizontal vectors allowed for the camera";
   }
@@ -84,10 +84,14 @@ var Camera = function(position, vector, viewportSize, zoom){
     for(var i = 0; i < polygon.vertices.length; i++){
       var point = polygon.vertices[i];
 
+      point.x += this.position.x;
+      point.y -= this.position.y;
+      point.z -= this.position.z;
+
       var tX = point.z * sin + point.x * cos;
       var tZ = point.z * cos - point.x * sin;
 
-      tX = -tX;
+      tX = -tX; //TODO: remove this ductape and let's design this correctly
 
       var x = tZ == 0 ? tX : (tX * this.zoom) / (tZ + this.zoom)
       var y = tZ == 0 ? point.y : (point.y * this.zoom) / (tZ + this.zoom);
