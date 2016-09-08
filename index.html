@@ -43,15 +43,18 @@
         }
         else if(event.keyCode == 65) { // if a
           myCanvas.camera.vector.rotateHorizontally(Math.PI / 16);
-          console.log(myCanvas.camera.vector);
         }
         else if(event.keyCode == 87){ // if w
           myCanvas.camera.position.add(myCanvas.camera.vector.getScaled(speed).toVertex());
-          console.log(myCanvas.camera.position);
         }
         else if(event.keyCode == 83){ // if s
           myCanvas.camera.position.add(myCanvas.camera.vector.getScaled(-speed).toVertex());
-          console.log(myCanvas.camera.position);
+        }
+        else if(event.keyCode == 81){ // if q
+          myCanvas.camera.position.add(new Vertex(0, -speed, 0));
+        }
+        else if(event.keyCode == 69){ // if e
+          myCanvas.camera.position.add(new Vertex(0, speed, 0));
         }
         else{
           // alert(event.keyCode);
