@@ -8,6 +8,10 @@ var Vertex = function(x, y, z){
     this.y += vertex.y;
     this.z += vertex.z;
   }
+
+  this.getScaled = function(scallar){
+    return new Vertex(this.x * scallar, this.y * scallar, this.z * scallar);
+  }
 }
 
 var Polygon = function(vertices, color){
@@ -59,12 +63,45 @@ var Vector = function(x, y, z){
   }
 }
 
+var Model = function(polygons, position, direction){
+  this.polygons = polygons ? polygons : [];
+  this.position = position ? position : new Vertex(0, 0, 0);
+  this.direction = direction ? direction : new Vector(0, 0, 1);
+}
+
+var ModelTemplates = {
+  //tileSize and colors are optional
+  tiledFloor: function(startX, startZ, width, length, tileSize, colors){
+    var tileSize = tileSize ? tileSize : 100;
+    var colors = colors ? colors : ['red', 'black'];
+    var y = 0;
+    var floor = new Model();
+    var tileCountX = Math.floor(width / tileSize);
+    var tileCountZ = Math.floor(length / tileSize);
+
+    for(var x = 0; x < tileCountX; x++){
+      for(var z = 0; z < tileCountZ; z++){
+        var polygon = new Polygon([new Vertex(x * tileSize, y, z * tileSize),
+          new Vertex((x + 1) * tileSize, y, z * tileSize),
+          new Vertex((x + 1) * tileSize, y, (z + 1) * tileSize),
+          new Vertex(x * tileSize, y, (z + 1) * tileSize)]);
+        if((x + z) % 2 == 0)
+          polygon.color = colors[0];
+        else
+          polygon.color = colors[1];
+        floor.polygons.push(polygon);
+      }
+    }
+
+    return floor;
+  }
+}
+
 var Camera = function(position, vector, viewportSize, zoom){
   this.position = position;
   this.vector = vector;
   this.viewportSize = viewportSize;
   this.zoom = zoom;
-  this.zOverflowThreshold = 0;
   if(this.vector.y != 0){
     throw "Rotation only around Y axis is implemented so, only horizontal vectors allowed for the camera";
   }
@@ -100,9 +137,7 @@ var Camera = function(position, vector, viewportSize, zoom){
 
       //tZ > ... can shortcircuit and make this faster since it generates a subset of the desired results
       //it checks if the vertex z coord is in front of the camera
-      if(tZ > this.zOverflowThreshold ||
-        (x >= -this.viewportSize[0] / 2 && x <= this.viewportSize[0] / 2 &&
-         y >= -this.viewportSize[1] / 2 && y <= this.viewportSize[1] / 2)){
+      if(tZ > 0){
         anyVertexVisible = true;
       }
     }
@@ -135,6 +170,19 @@ var Canvas = function(canvasId){
 
       this.ctx.fillStyle = polygon.color;
       this.ctx.fill();
+    }
+  }
+
+  this.renderModel = function(model){
+    for(var i = 0; i < model.polygons.length; i++){
+      var polygon = model.polygons[i];
+      for(var j = 0; j < polygon.vertices.length; j++){
+        polygon.vertices[j].x += model.position.x;
+        polygon.vertices[j].y += model.position.y;
+        polygon.vertices[j].z += model.position.z;
+      }
+
+      this.draw3DPolygon(polygon);
     }
   }
 

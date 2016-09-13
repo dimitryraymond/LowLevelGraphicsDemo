@@ -13,42 +13,29 @@
 
     var myCanvas = new Canvas('myCanvas');
 
-    function displayRow(item, index, array){
-      var y = item;
-      for(var i = -5; i < 5; i++){
-        for(var z = -5; z < 5; z++){
-          var polygon = new Polygon([new Vertex(i * 100, y, z * 100),
-            new Vertex((i + 1) * 100, y, z * 100),
-            new Vertex((i + 1) * 100, y, (z + 1) * 100),
-            new Vertex(i * 100, y, (z + 1) * 100)]);
-          if((i + z) % 2 == 0)
-            polygon.color = 'red';
-          else
-            polygon.color = 'black';
-          myCanvas.draw3DPolygon(polygon);
-        }
-      }
-    }
+    var model = ModelTemplates.tiledFloor(-500, -500, 1000, 1000, 50, ['black', 'red'])
+    model.position = new Vertex(0, -50, 0);
 
     function render(){
       myCanvas.clearScreen();
-      [-250, 50].forEach(displayRow);
+      myCanvas.renderModel(model);
     }
+
+    render();
 
     var speed = 50;
     document.addEventListener('keydown', function(event) {
         if(event.keyCode == 68) { // if d
           myCanvas.camera.vector.rotateHorizontally(-Math.PI / 16);
-          console.log(myCanvas.camera.vector);
         }
         else if(event.keyCode == 65) { // if a
           myCanvas.camera.vector.rotateHorizontally(Math.PI / 16);
         }
         else if(event.keyCode == 87){ // if w
-          myCanvas.camera.position.add(myCanvas.camera.vector.getScaled(speed).toVertex());
+          myCanvas.camera.position.add(myCanvas.camera.vector.toVertex().getScaled(speed));
         }
         else if(event.keyCode == 83){ // if s
-          myCanvas.camera.position.add(myCanvas.camera.vector.getScaled(-speed).toVertex());
+          myCanvas.camera.position.add(myCanvas.camera.vector.toVertex().getScaled(-speed));
         }
         else if(event.keyCode == 81){ // if q
           myCanvas.camera.position.add(new Vertex(0, -speed, 0));
@@ -62,7 +49,6 @@
         render();
     });
 
-    render();
   </script>
 </body>
 </html>
