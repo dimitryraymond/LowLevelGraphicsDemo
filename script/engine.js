@@ -59,7 +59,7 @@ var Vector = function(x, y, z){
   }
 
   this.toVertex = function(){
-    return new Vertex(x, y, z);
+    return new Vertex(this.x, this.y, this.z);
   }
 }
 
@@ -130,12 +130,12 @@ var Camera = function(position, vector, viewportSize, zoom){
 
       tX = -tX; //TODO: remove this ductape and let's design this correctly
 
+      //provides the depth
       var x = tZ == 0 ? tX : (tX * this.zoom) / (tZ + this.zoom)
       var y = tZ == 0 ? point.y : (point.y * this.zoom) / (tZ + this.zoom);
 
       this.cashedVertices.push([x, -y]);
 
-      //tZ > ... can shortcircuit and make this faster since it generates a subset of the desired results
       //it checks if the vertex z coord is in front of the camera
       if(tZ > 0){
         anyVertexVisible = true;
@@ -175,11 +175,14 @@ var Canvas = function(canvasId){
 
   this.renderModel = function(model){
     for(var i = 0; i < model.polygons.length; i++){
-      var polygon = model.polygons[i];
-      for(var j = 0; j < polygon.vertices.length; j++){
-        polygon.vertices[j].x += model.position.x;
-        polygon.vertices[j].y += model.position.y;
-        polygon.vertices[j].z += model.position.z;
+      var polygon = new Polygon([], model.polygons[i].color);
+
+      for(var j = 0; j < model.polygons[i].vertices.length; j++){
+        var vertex = new Vertex(0, 0, 0);
+        vertex.x = model.polygons[i].vertices[j].x + model.position.x;
+        vertex.y = model.polygons[i].vertices[j].y + model.position.y;
+        vertex.z = model.polygons[i].vertices[j].z + model.position.z;
+        polygon.vertices.push(vertex);
       }
 
       this.draw3DPolygon(polygon);
