@@ -81,10 +81,11 @@ var ModelTemplates = {
 
     for(var x = 0; x < tileCountX; x++){
       for(var z = 0; z < tileCountZ; z++){
-        var polygon = new Polygon([new Vertex(x * tileSize, y, z * tileSize),
-          new Vertex((x + 1) * tileSize, y, z * tileSize),
-          new Vertex((x + 1) * tileSize, y, (z + 1) * tileSize),
-          new Vertex(x * tileSize, y, (z + 1) * tileSize)]);
+        var polygon = new Polygon([new Vertex(x * tileSize + startX, y, z * tileSize + startZ),
+          new Vertex((x + 1) * tileSize + startX, y, z * tileSize + startZ),
+          new Vertex((x + 1) * tileSize + startX, y, (z + 1) * tileSize + startZ),
+          new Vertex(x * tileSize + startX, y, (z + 1) * tileSize + startZ)]
+        );
         if((x + z) % 2 == 0)
           polygon.color = colors[0];
         else
