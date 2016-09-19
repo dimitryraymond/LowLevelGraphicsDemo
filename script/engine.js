@@ -81,7 +81,8 @@ var ModelTemplates = {
 
     for(var x = 0; x < tileCountX; x++){
       for(var z = 0; z < tileCountZ; z++){
-        var polygon = new Polygon([new Vertex(x * tileSize + startX, y, z * tileSize + startZ),
+        var polygon = new Polygon(
+          [new Vertex(x * tileSize + startX, y, z * tileSize + startZ),
           new Vertex((x + 1) * tileSize + startX, y, z * tileSize + startZ),
           new Vertex((x + 1) * tileSize + startX, y, (z + 1) * tileSize + startZ),
           new Vertex(x * tileSize + startX, y, (z + 1) * tileSize + startZ)]
@@ -122,14 +123,13 @@ var Camera = function(position, vector, viewportSize, zoom){
     for(var i = 0; i < polygon.vertices.length; i++){
       var point = polygon.vertices[i];
 
-      point.x += this.position.x;
+      //camera position offset
+      point.x -= this.position.x;
       point.y -= this.position.y;
       point.z -= this.position.z;
 
-      var tX = point.z * sin + point.x * cos;
-      var tZ = point.z * cos - point.x * sin;
-
-      tX = -tX; //TODO: remove this ductape and let's design this correctly
+      var tX = point.x * cos - point.z * sin;
+      var tZ = point.x * sin + point.z * cos;
 
       //provides the depth
       var x = tZ == 0 ? tX : (tX * this.zoom) / (tZ + this.zoom)
