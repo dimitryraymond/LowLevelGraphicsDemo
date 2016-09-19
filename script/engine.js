@@ -139,7 +139,17 @@ var Camera = function(position, vector, viewportSize, zoom){
 
       //it checks if the vertex z coord is in front of the camera
       if(tZ > 0){
-        anyVertexVisible = true;
+        //occlusion culling TODO: does canvas already do this? I noticed no difference
+        // TODO: this filters out a polygon that's within sight but is bigger than the viewport, fix this?
+        if(x > viewportSize[0] / 2 || x < -viewportSize[0] / 2){
+          //point is too far to the side
+        }
+        else if(y > viewportSize[1] / 2 || y < -viewportSize[1] / 2){
+          //point is too far high or low
+        }
+        else{
+          anyVertexVisible = true;
+        }
       }
     }
     return anyVertexVisible;
