@@ -24,30 +24,38 @@
     render();
 
     var speed = 50;
-    document.addEventListener('keydown', function(event) {
-        if(event.keyCode == 68) { // if d
-          myCanvas.camera.vector.rotateHorizontally(-Math.PI / 16);
-        }
-        else if(event.keyCode == 65) { // if a
-          myCanvas.camera.vector.rotateHorizontally(Math.PI / 16);
-        }
-        else if(event.keyCode == 87){ // if w
-          myCanvas.camera.position.add(myCanvas.camera.vector.toVertex().getScaled(speed));
-        }
-        else if(event.keyCode == 83){ // if s
-          myCanvas.camera.position.add(myCanvas.camera.vector.toVertex().getScaled(-speed));
-        }
-        else if(event.keyCode == 81){ // if q
-          myCanvas.camera.position.add(new Vertex(0, -speed, 0));
-        }
-        else if(event.keyCode == 69){ // if e
-          myCanvas.camera.position.add(new Vertex(0, speed, 0));
-        }
-        else{
-          // alert(event.keyCode);
-        }
-        render();
-    });
+
+    var update = function() {
+      if(keysDown[key.d]) { // if d
+        myCanvas.camera.vector.rotateHorizontally(-Math.PI / 16);
+      }
+      if(keysDown[key.a]) { // if a
+        myCanvas.camera.vector.rotateHorizontally(Math.PI / 16);
+      }
+      if(keysDown[key.w]){ // if w
+        myCanvas.camera.position.add(myCanvas.camera.vector.toVertex().getScaled(speed));
+      }
+      if(keysDown[key.s]){ // if s
+        myCanvas.camera.position.add(myCanvas.camera.vector.toVertex().getScaled(-speed));
+      }
+      if(keysDown[key.q]){ // if q
+        myCanvas.camera.position.add(new Vertex(0, -speed, 0));
+      }
+      if(keysDown[key.e]){ // if e
+        myCanvas.camera.position.add(new Vertex(0, speed, 0));
+      }
+
+      render();
+    }
+
+    document.addEventListener("mousemove", logMouse);
+
+    function logMouse(e){
+      console.log(e);
+    }
+
+    var fps = 20;
+    setInterval(update, 1000 / 20);
 
   </script>
 </body>

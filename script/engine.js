@@ -167,6 +167,7 @@ var Canvas = function(canvasId){
   this.ctx.font = "30px Arial";
   this.ctx.fillStyle = this.defaultFillStyle;
   this.ctx.strokeStyle = this.defaultStrokeStyle;
+  enableKeyboard();
 
   this.draw3DPolygon = function(polygon){
     if(this.camera.polygonInView(polygon)){
@@ -207,4 +208,25 @@ var Canvas = function(canvasId){
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.ctx.restore();
   }
+}
+
+var key = {
+  w: 87, a: 65, s: 83, d: 68, q: 81, e: 69
+}
+
+var keysDown = null;
+function enableKeyboard(){
+  keysDown = new Array(256);
+  for(var i = 0; i < 256; i++){
+    keysDown[i] = false;
+  }
+
+  document.onkeydown = function(e){
+    keysDown[e.keyCode] = true;
+  }
+
+  document.onkeyup = function(e){
+    keysDown[e.keyCode] = false;
+  };
+
 }
