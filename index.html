@@ -48,14 +48,14 @@
       render();
     }
 
-    document.addEventListener("mousemove", logMouse);
+    // document.addEventListener("mousemove", logMouse);
+    //
+    // function logMouse(e){
+    //   console.log(e);
+    // }
 
-    function logMouse(e){
-      console.log(e);
-    }
-
-    var fps = 20;
-    setInterval(update, 1000 / 20);
+    var fps = myCanvas.framerate;
+    setInterval(update, 1000 / fps);
 
   </script>
 </body>

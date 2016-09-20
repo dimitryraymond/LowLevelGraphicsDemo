@@ -157,6 +157,7 @@ var Camera = function(position, vector, viewportSize, zoom){
 }
 
 var Canvas = function(canvasId){
+  this.framerate = 30;
   this.canvas = document.getElementById(canvasId);
   this.ctx = this.canvas.getContext("2d");
   this.zoom = 600;
@@ -167,7 +168,8 @@ var Canvas = function(canvasId){
   this.ctx.font = "30px Arial";
   this.ctx.fillStyle = this.defaultFillStyle;
   this.ctx.strokeStyle = this.defaultStrokeStyle;
-  enableKeyboard();
+  enableKeyboardEvents();
+  enableMouseEvents(this);
 
   this.draw3DPolygon = function(polygon){
     if(this.camera.polygonInView(polygon)){
@@ -215,7 +217,7 @@ var key = {
 }
 
 var keysDown = null;
-function enableKeyboard(){
+function enableKeyboardEvents(){
   keysDown = new Array(256);
   for(var i = 0; i < 256; i++){
     keysDown[i] = false;
@@ -227,6 +229,23 @@ function enableKeyboard(){
 
   document.onkeyup = function(e){
     keysDown[e.keyCode] = false;
-  };
+  }
+}
 
+//push mouseCoords onto this 'queue' with mousemove events, as events get used they will get popped off
+var mouseEvents = [];
+function enableMouseEvents(scene){
+  var canvasBounds = scene.canvas.getBoundingClientRect();
+  var widthRatio = scene.canvas.width / canvasBounds.width;
+  var heightRatio = scene.canvas.height / canvasBounds.height;
+
+  document.onmousemove = function(e){
+    //restrict pushing to this 'stack' if it get's overloaded
+    if(mouseEvents.length < 20){
+      var x = (e.clientX - canvasBounds.left) * widthRatio;
+      var y = (e.clientY - canvasBounds.top) * heightRatio;
+      //when elements get popped of, I want it to be like a queue instead of a stack
+      mouseEvents.unshift([{x, y}]);
+    }
+  }
 }
