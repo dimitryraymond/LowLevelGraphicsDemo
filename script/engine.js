@@ -169,7 +169,7 @@ var Scene = function(canvasId){
   this.ctx.strokeStyle = this.defaultStrokeStyle;
 
   this.keysDown = null;
-  this.mouseEvents = [];
+  this.mouseEvents = null;
   enableKeyboardEvents(this);
   enableMouseEvents(this);
 
@@ -238,6 +238,7 @@ function enableKeyboardEvents(scene){
 //push mouseCoords onto this 'queue' with mousemove events, as events get used they will get shifted off
 
 function enableMouseEvents(scene){
+  scene.mouseEvents = [];
   var canvasBounds = scene.canvas.getBoundingClientRect();
   var widthRatio = scene.canvas.width / canvasBounds.width;
   var heightRatio = scene.canvas.height / canvasBounds.height;
@@ -250,7 +251,7 @@ function enableMouseEvents(scene){
       if(scene.mouseEvents.length < 20){
         var x = (e.clientX - canvasBounds.left) * widthRatio;
         var y = (e.clientY - canvasBounds.top) * heightRatio;
-        //when elements get shifted of, I want it to be like a queue instead of a stack
+        //when elements get shifted off, I want it to be like a queue instead of a stack
         if(y >= 0 && y < 500)
           scene.mouseEvents.push({x, y}); //temp fix to not having control of mouse
       }
@@ -259,6 +260,7 @@ function enableMouseEvents(scene){
 }
 
 var MouseHelper = {
+  //TODO: need to save the lastest mousePosition and use it
   //get the difference from the earliest
   popDisplacement: function(scene){
     //there's no difference between elements if there is only 1 element
