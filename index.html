@@ -7,18 +7,18 @@
 </head>
 <body>
 
-  <canvas id='myCanvas' width="1000" height="500">no canvas?</canvas>
+  <canvas id='myScene' width="1000" height="500">no canvas?</canvas>
   <script src="script/engine.js" /></script>
   <script>
 
-    var myCanvas = new Canvas('myCanvas');
+    var myScene = new Scene('myScene');
 
     var model = ModelTemplates.tiledFloor(-1000, -1000, 2000, 2000, 40, ['black', 'blue'])
     model.position = new Vertex(0, -250, 0);
 
     function render(){
-      myCanvas.clearScreen();
-      myCanvas.renderModel(model);
+      myScene.clearScreen();
+      myScene.renderModel(model);
     }
 
     render();
@@ -28,25 +28,25 @@
     var update = function() {
       var d = MouseHelper.popAllDisplacement();
       if(d){
-        myCanvas.camera.vector.rotateHorizontally(-d.dX / 200);
+        myScene.camera.vector.rotateHorizontally(-d.dX / 200);
       }
       if(keysDown[key.d]) { // if d
-        myCanvas.camera.vector.rotateHorizontally(-Math.PI / 16);
+        myScene.camera.vector.rotateHorizontally(-Math.PI / 16);
       }
       if(keysDown[key.a]) { // if a
-        myCanvas.camera.vector.rotateHorizontally(Math.PI / 16);
+        myScene.camera.vector.rotateHorizontally(Math.PI / 16);
       }
       if(keysDown[key.w]){ // if w
-        myCanvas.camera.position.add(myCanvas.camera.vector.toVertex().getScaled(speed));
+        myScene.camera.position.add(myScene.camera.vector.toVertex().getScaled(speed));
       }
       if(keysDown[key.s]){ // if s
-        myCanvas.camera.position.add(myCanvas.camera.vector.toVertex().getScaled(-speed));
+        myScene.camera.position.add(myScene.camera.vector.toVertex().getScaled(-speed));
       }
       if(keysDown[key.q]){ // if q
-        myCanvas.camera.position.add(new Vertex(0, -speed, 0));
+        myScene.camera.position.add(new Vertex(0, -speed, 0));
       }
       if(keysDown[key.e]){ // if e
-        myCanvas.camera.position.add(new Vertex(0, speed, 0));
+        myScene.camera.position.add(new Vertex(0, speed, 0));
       }
 
       render();
@@ -58,7 +58,7 @@
     //   console.log(e);
     // }
 
-    var fps = myCanvas.framerate;
+    var fps = myScene.framerate;
     setInterval(update, 1000 / fps);
 
   </script>

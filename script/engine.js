@@ -156,7 +156,7 @@ var Camera = function(position, vector, viewportSize, zoom){
   }
 }
 
-var Canvas = function(canvasId){
+var Scene = function(canvasId){
   this.framerate = 30;
   this.canvas = document.getElementById(canvasId);
   this.ctx = this.canvas.getContext("2d");
