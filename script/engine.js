@@ -232,7 +232,7 @@ function enableKeyboardEvents(){
   }
 }
 
-//push mouseCoords onto this 'queue' with mousemove events, as events get used they will get popped off
+//push mouseCoords onto this 'queue' with mousemove events, as events get used they will get shifted off
 var mouseEvents = [];
 function enableMouseEvents(scene){
   var canvasBounds = scene.canvas.getBoundingClientRect();
@@ -244,8 +244,35 @@ function enableMouseEvents(scene){
     if(mouseEvents.length < 20){
       var x = (e.clientX - canvasBounds.left) * widthRatio;
       var y = (e.clientY - canvasBounds.top) * heightRatio;
-      //when elements get popped of, I want it to be like a queue instead of a stack
-      mouseEvents.unshift([{x, y}]);
+      //when elements get shifted of, I want it to be like a queue instead of a stack
+      mouseEvents.push({x, y});
+    }
+  }
+}
+
+var MouseHelper = {
+  //get the difference from the earliest
+  popDisplacement: function(){
+    //there's no difference between elements if there is only 1 element
+    if(mouseEvents.length > 1){
+      var dX = mouseEvents[1].x - mouseEvents[0].x;
+      var dY = mouseEvents[1].y - mouseEvents[0].y;
+
+      mouseEvents.shift();
+
+      return({dX, dY});
+    }
+  },
+
+  popAllDisplacement: function(){
+    //there's no difference between elements if there is only 1 element
+    if(mouseEvents.length > 1){
+      var dX = mouseEvents[mouseEvents.length - 1].x - mouseEvents[0].x;
+      var dY = mouseEvents[mouseEvents.length - 1].y - mouseEvents[0].y;
+
+      //keep the most recent element to be able to reference it in next difference calculation
+      mouseEvents = [mouseEvents[mouseEvents.length - 1]];
+      return({dX, dY});
     }
   }
 }

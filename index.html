@@ -26,6 +26,7 @@
     var speed = 50;
 
     var update = function() {
+      console.log(MouseHelper.popAllDisplacement());
       if(keysDown[key.d]) { // if d
         myCanvas.camera.vector.rotateHorizontally(-Math.PI / 16);
       }
