@@ -26,7 +26,10 @@
     var speed = 50;
 
     var update = function() {
-      console.log(MouseHelper.popAllDisplacement());
+      var d = MouseHelper.popAllDisplacement();
+      if(d){
+        myCanvas.camera.vector.rotateHorizontally(-d.dX / 200);
+      }
       if(keysDown[key.d]) { // if d
         myCanvas.camera.vector.rotateHorizontally(-Math.PI / 16);
       }

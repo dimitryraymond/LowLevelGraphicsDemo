@@ -9,6 +9,8 @@ body {
   padding-top: 2%;
   padding-left: 6%;
   padding-right: 6%;
+  /*hide cursor*/
+  /*cursor: none;*/
 }
 #myCanvas{
   width: 100%;

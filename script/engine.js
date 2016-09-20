@@ -240,13 +240,18 @@ function enableMouseEvents(scene){
   var heightRatio = scene.canvas.height / canvasBounds.height;
 
   document.onmousemove = function(e){
+    //left = 1, right = 2, middle = 4;
+    //if left button click included in all other clicks
+    //if(e.buttons % 2 == 1){
     //restrict pushing to this 'stack' if it get's overloaded
-    if(mouseEvents.length < 20){
-      var x = (e.clientX - canvasBounds.left) * widthRatio;
-      var y = (e.clientY - canvasBounds.top) * heightRatio;
-      //when elements get shifted of, I want it to be like a queue instead of a stack
-      mouseEvents.push({x, y});
-    }
+      if(mouseEvents.length < 20){
+        var x = (e.clientX - canvasBounds.left) * widthRatio;
+        var y = (e.clientY - canvasBounds.top) * heightRatio;
+        //when elements get shifted of, I want it to be like a queue instead of a stack
+        if(y >= 0 && y < 500)
+          mouseEvents.push({x, y}); //temp fix to not having control of mouse
+      }
+    //}
   }
 }
 
@@ -272,6 +277,7 @@ var MouseHelper = {
 
       //keep the most recent element to be able to reference it in next difference calculation
       mouseEvents = [mouseEvents[mouseEvents.length - 1]];
+      mouseEvents = [];
       return({dX, dY});
     }
   }
