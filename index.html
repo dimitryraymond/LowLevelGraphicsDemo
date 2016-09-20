@@ -26,26 +26,26 @@
     var speed = 50;
 
     var update = function() {
-      var d = MouseHelper.popAllDisplacement();
+      var d = MouseHelper.popAllDisplacement(myScene);
       if(d){
         myScene.camera.vector.rotateHorizontally(-d.dX / 200);
       }
-      if(keysDown[key.d]) { // if d
+      if(myScene.keysDown[key.d]) { // if d
         myScene.camera.vector.rotateHorizontally(-Math.PI / 16);
       }
-      if(keysDown[key.a]) { // if a
+      if(myScene.keysDown[key.a]) { // if a
         myScene.camera.vector.rotateHorizontally(Math.PI / 16);
       }
-      if(keysDown[key.w]){ // if w
+      if(myScene.keysDown[key.w]){ // if w
         myScene.camera.position.add(myScene.camera.vector.toVertex().getScaled(speed));
       }
-      if(keysDown[key.s]){ // if s
+      if(myScene.keysDown[key.s]){ // if s
         myScene.camera.position.add(myScene.camera.vector.toVertex().getScaled(-speed));
       }
-      if(keysDown[key.q]){ // if q
+      if(myScene.keysDown[key.q]){ // if q
         myScene.camera.position.add(new Vertex(0, -speed, 0));
       }
-      if(keysDown[key.e]){ // if e
+      if(myScene.keysDown[key.e]){ // if e
         myScene.camera.position.add(new Vertex(0, speed, 0));
       }
 

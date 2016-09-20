@@ -168,7 +168,10 @@ var Scene = function(canvasId){
   this.ctx.font = "30px Arial";
   this.ctx.fillStyle = this.defaultFillStyle;
   this.ctx.strokeStyle = this.defaultStrokeStyle;
-  enableKeyboardEvents();
+
+  this.keysDown = null;
+  this.mouseEvents = [];
+  enableKeyboardEvents(this);
   enableMouseEvents(this);
 
   this.draw3DPolygon = function(polygon){
@@ -191,6 +194,7 @@ var Scene = function(canvasId){
     for(var i = 0; i < model.polygons.length; i++){
       var polygon = new Polygon([], model.polygons[i].color);
 
+      //offset position of polygon's vertices relative to polygons parent model
       for(var j = 0; j < model.polygons[i].vertices.length; j++){
         var vertex = new Vertex(0, 0, 0);
         vertex.x = model.polygons[i].vertices[j].x + model.position.x;
@@ -216,24 +220,24 @@ var key = {
   w: 87, a: 65, s: 83, d: 68, q: 81, e: 69
 }
 
-var keysDown = null;
-function enableKeyboardEvents(){
-  keysDown = new Array(256);
+
+function enableKeyboardEvents(scene){
+  scene.keysDown = new Array(256);
   for(var i = 0; i < 256; i++){
-    keysDown[i] = false;
+    scene.keysDown[i] = false;
   }
 
   document.onkeydown = function(e){
-    keysDown[e.keyCode] = true;
+    scene.keysDown[e.keyCode] = true;
   }
 
   document.onkeyup = function(e){
-    keysDown[e.keyCode] = false;
+    scene.keysDown[e.keyCode] = false;
   }
 }
 
 //push mouseCoords onto this 'queue' with mousemove events, as events get used they will get shifted off
-var mouseEvents = [];
+
 function enableMouseEvents(scene){
   var canvasBounds = scene.canvas.getBoundingClientRect();
   var widthRatio = scene.canvas.width / canvasBounds.width;
@@ -244,12 +248,12 @@ function enableMouseEvents(scene){
     //if left button click included in all other clicks
     //if(e.buttons % 2 == 1){
     //restrict pushing to this 'stack' if it get's overloaded
-      if(mouseEvents.length < 20){
+      if(scene.mouseEvents.length < 20){
         var x = (e.clientX - canvasBounds.left) * widthRatio;
         var y = (e.clientY - canvasBounds.top) * heightRatio;
         //when elements get shifted of, I want it to be like a queue instead of a stack
         if(y >= 0 && y < 500)
-          mouseEvents.push({x, y}); //temp fix to not having control of mouse
+          scene.mouseEvents.push({x, y}); //temp fix to not having control of mouse
       }
     //}
   }
@@ -257,27 +261,27 @@ function enableMouseEvents(scene){
 
 var MouseHelper = {
   //get the difference from the earliest
-  popDisplacement: function(){
+  popDisplacement: function(scene){
     //there's no difference between elements if there is only 1 element
-    if(mouseEvents.length > 1){
-      var dX = mouseEvents[1].x - mouseEvents[0].x;
-      var dY = mouseEvents[1].y - mouseEvents[0].y;
+    if(scene.mouseEvents.length > 1){
+      var dX = scene.mouseEvents[1].x - scene.mouseEvents[0].x;
+      var dY = scene.mouseEvents[1].y - scene.mouseEvents[0].y;
 
-      mouseEvents.shift();
+      scene.mouseEvents.shift();
 
       return({dX, dY});
     }
   },
 
-  popAllDisplacement: function(){
+  popAllDisplacement: function(scene){
     //there's no difference between elements if there is only 1 element
-    if(mouseEvents.length > 1){
-      var dX = mouseEvents[mouseEvents.length - 1].x - mouseEvents[0].x;
-      var dY = mouseEvents[mouseEvents.length - 1].y - mouseEvents[0].y;
+    if(scene.mouseEvents.length > 1){
+      var dX = scene.mouseEvents[scene.mouseEvents.length - 1].x - scene.mouseEvents[0].x;
+      var dY = scene.mouseEvents[scene.mouseEvents.length - 1].y - scene.mouseEvents[0].y;
 
       //keep the most recent element to be able to reference it in next difference calculation
-      mouseEvents = [mouseEvents[mouseEvents.length - 1]];
-      mouseEvents = [];
+      scene.mouseEvents = [scene.mouseEvents[scene.mouseEvents.length - 1]];
+      scene.mouseEvents = [];
       return({dX, dY});
     }
   }
