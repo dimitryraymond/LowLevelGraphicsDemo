@@ -16,9 +16,13 @@
     var model = ModelTemplates.tiledFloor(-1000, -1000, 2000, 2000, 40, ['black', 'blue'])
     model.position = new Vertex(0, -250, 0);
 
+    var box = ModelTemplates.box(0, 0, 0, 100, 200, 400, 'rgba(255, 0, 255, .2)');
+    box.position = new Vertex(100, 100, 500);
+
     function render(){
       myScene.clearScreen();
       myScene.renderModel(model);
+      myScene.renderModel(box);
     }
 
     render();

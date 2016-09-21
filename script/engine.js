@@ -96,6 +96,58 @@ var ModelTemplates = {
     }
 
     return floor;
+  },
+  box: function(x, y, z, width, height, depth, color){
+    var box = new Model();
+    //back
+    box.polygons.push(new Polygon(
+      [new Vertex(x, y, z + depth),
+      new Vertex(x + width, y, z + depth),
+      new Vertex(x + width, y + height, z + depth),
+      new Vertex(x, y + height, z + depth)],
+      'rgba(0, 0, 0, .4)' //need to hardcode other color to be sure my rendering is done correctly
+    ));
+    //right
+    box.polygons.push(new Polygon(
+      [new Vertex(x + width, y, z),
+      new Vertex(x + width, y, z + depth),
+      new Vertex(x + width, y + height, z + depth),
+      new Vertex(x + width, y + height, z)],
+      'rgba(255, 0, 0, .2)' //need to hardcode other color to be sure my rendering is done correctly
+    ));
+    //top
+    box.polygons.push(new Polygon(
+      [new Vertex(x, y + height, z),
+      new Vertex(x + width, y + height, z),
+      new Vertex(x + width, y + height, z + depth),
+      new Vertex(x, y + height, z + depth)],
+      'rgba(0, 255, 255, .2)' //need to hardcode other color to be sure my rendering is done correctly
+    ));
+    //bottom
+    box.polygons.push(new Polygon(
+      [new Vertex(x, y, z),
+      new Vertex(x + width, y, z),
+      new Vertex(x + width, y, z + depth),
+      new Vertex(x, y, z + depth)],
+      'rgba(127, 127, 255, .2)' //need to hardcode other color to be sure my rendering is done correctly
+    ));
+    //left
+    box.polygons.push(new Polygon(
+      [new Vertex(x, y, z + depth),
+      new Vertex(x, y, z),
+      new Vertex(x, y + height, z),
+      new Vertex(x, y + height, z + depth)],
+      'rgba(0, 255, 0, .2)' //need to hardcode other color to be sure my rendering is done correctly
+    ));
+    //front
+    box.polygons.push(new Polygon(
+      [new Vertex(x, y, z),
+      new Vertex(x + width, y, z),
+      new Vertex(x + width, y + height, z),
+      new Vertex(x, y + height, z)],
+      color
+    ));
+    return box;
   }
 }
 
