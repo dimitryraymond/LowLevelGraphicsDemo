@@ -30,9 +30,9 @@
     var speed = 50;
 
     var update = function() {
-      var d = MouseHelper.popAllDisplacement(myScene);
-      if(d){
-        myScene.camera.vector.rotateHorizontally(-d.dX / 200);
+      var displacement = MouseHelper.popAllDisplacement(myScene);
+      if(displacement){
+        myScene.camera.vector.rotateHorizontally(-displacement.dX / 200);
       }
       if(myScene.keysDown[key.d]) { // if d
         myScene.camera.vector.rotateHorizontally(-Math.PI / 16);
@@ -41,22 +41,22 @@
         myScene.camera.vector.rotateHorizontally(Math.PI / 16);
       }
       if(myScene.keysDown[key.w]){ // if w
-        myScene.camera.position.add(myScene.camera.vector.toVertex().getScaled(speed));
+        myScene.camera.position.moveAbsolute(myScene.camera.vector.toVertex().getScaled(speed));
       }
       if(myScene.keysDown[key.s]){ // if s
-        myScene.camera.position.add(myScene.camera.vector.toVertex().getScaled(-speed));
+        myScene.camera.position.moveAbsolute(myScene.camera.vector.toVertex().getScaled(-speed));
       }
       if(myScene.keysDown[key.q]){ // if q
-        myScene.camera.position.add(new Vertex(0, -speed, 0));
+        myScene.camera.position.moveAbsolute(new Vertex(0, -speed, 0));
       }
       if(myScene.keysDown[key.e]){ // if e
-        myScene.camera.position.add(new Vertex(0, speed, 0));
+        myScene.camera.position.moveAbsolute(new Vertex(0, speed, 0));
       }
 
       render();
     }
 
-    // document.addEventListener("mousemove", logMouse);
+    // document.moveAbsoluteEventListener("mousemove", logMouse);
     //
     // function logMouse(e){
     //   console.log(e);

@@ -3,7 +3,7 @@ var Vertex = function(x, y, z){
   this.y = y;
   this.z = z;
 
-  this.add = function(vertex){
+  this.moveAbsolute = function(vertex){
     this.x += vertex.x;
     this.y += vertex.y;
     this.z += vertex.z;
