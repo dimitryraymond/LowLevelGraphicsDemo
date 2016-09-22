@@ -68,10 +68,22 @@ var Vector = function(x, y, z){
   }
 }
 
-var Model = function(polygons, position, direction){
+var Model = function(polygons, position, direction, velocity){
   this.polygons = polygons ? polygons : [];
-  this.position = position ? position : new Vertex(0, 0, 0);
   this.direction = direction ? direction : new Vector(0, 0, 1);
+  this.position = position ? position : new Vertex(0, 0, 0);
+  this.velocity = velocity ? velocity : new Vertex(0, 0, 0);
+  this.HasGravityEnabled = false;
+
+  this.update = function(fps){
+    //update motion
+    this.position.x += this.velocity.x;
+    this.position.y += this.velocity.y;
+    this.position.z += this.velocity.z;
+
+    if(this.HasGravityEnabled)
+      this.velocity.y += (GRAVITY / fps);
+  }
 }
 
 var ModelTemplates = {
@@ -301,10 +313,16 @@ var Scene = function(canvasId){
   }
 }
 
+//Global Constants
 var key = {
   w: 87, a: 65, s: 83, d: 68, q: 81, e: 69
 }
 
+var LookThreshold = {
+  Weak: 100, Med: 50
+}
+
+var GRAVITY = -90;
 
 function enableKeyboardEvents(scene){
   scene.keysDown = new Array(256);
@@ -340,10 +358,6 @@ function enableMouseEvents(scene){
       scene.mouseEvents.push({x, y});
     }
   }
-}
-
-var LookThreshold = {
-  Weak: 100, Med: 50
 }
 
 var MouseHelper = {
