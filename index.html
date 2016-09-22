@@ -27,32 +27,8 @@
 
     render();
 
-    var speed = 50;
-
     var update = function() {
-      var lookHorizontalScalar = MouseHelper.GetLookHorizontalScalar(myScene);
-      if(lookHorizontalScalar != 0){
-        myScene.camera.vector.rotateHorizontally(-1 * lookHorizontalScalar * Math.PI / 10);
-      }
-
-      if(myScene.keysDown[key.d]) { // if d
-        myScene.camera.position.shiftHorizontalRelativeToVector(myScene.camera.vector, speed);
-      }
-      if(myScene.keysDown[key.a]) { // if a
-        myScene.camera.position.shiftHorizontalRelativeToVector(myScene.camera.vector, -speed);
-      }
-      if(myScene.keysDown[key.w]){ // if w
-        myScene.camera.position.moveAbsolute(myScene.camera.vector.toVertex().getScaled(speed));
-      }
-      if(myScene.keysDown[key.s]){ // if s
-        myScene.camera.position.moveAbsolute(myScene.camera.vector.toVertex().getScaled(-speed));
-      }
-      if(myScene.keysDown[key.q]){ // if q
-        myScene.camera.position.moveAbsolute(new Vertex(0, -speed, 0));
-      }
-      if(myScene.keysDown[key.e]){ // if e
-        myScene.camera.position.moveAbsolute(new Vertex(0, speed, 0));
-      }
+      myScene.camera.updateMotion(myScene);
 
       render();
     }

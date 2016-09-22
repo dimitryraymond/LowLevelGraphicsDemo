@@ -162,6 +162,7 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity){
   this.viewportSize = viewportSize;
   this.zoom = zoom;
   this.sensitivity = sensitivity;
+  this.speed = 50;
   if(this.vector.y != 0){
     throw "Rotation only around Y axis is implemented, so only horizontal vectors allowed for the camera";
   }
@@ -210,6 +211,32 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity){
       }
     }
     return anyVertexVisible;
+  }
+
+  this.updateMotion = function(scene){
+    var lookHorizontalScalar = MouseHelper.GetLookHorizontalScalar(scene);
+    if(lookHorizontalScalar != 0){
+      this.vector.rotateHorizontally(-1 * lookHorizontalScalar * Math.PI / 15);
+    }
+
+    if(scene.keysDown[key.d]) { // if d
+      this.position.shiftHorizontalRelativeToVector(this.vector, this.speed);
+    }
+    if(scene.keysDown[key.a]) { // if a
+      this.position.shiftHorizontalRelativeToVector(this.vector, -this.speed);
+    }
+    if(scene.keysDown[key.w]){ // if w
+      this.position.moveAbsolute(this.vector.toVertex().getScaled(this.speed));
+    }
+    if(scene.keysDown[key.s]){ // if s
+      this.position.moveAbsolute(this.vector.toVertex().getScaled(-this.speed));
+    }
+    if(scene.keysDown[key.q]){ // if q
+      this.position.moveAbsolute(new Vertex(0, -this.speed, 0));
+    }
+    if(scene.keysDown[key.e]){ // if e
+      this.position.moveAbsolute(new Vertex(0, this.speed, 0));
+    }
   }
 }
 
