@@ -30,10 +30,11 @@
     var speed = 50;
 
     var update = function() {
-      var displacement = MouseHelper.popAllDisplacement(myScene);
-      if(displacement){
-        myScene.camera.vector.rotateHorizontally(-displacement.dX / 200);
+      var lookHorizontalScalar = MouseHelper.GetLookHorizontalScalar(myScene);
+      if(lookHorizontalScalar != 0){
+        myScene.camera.vector.rotateHorizontally(-1 * lookHorizontalScalar * Math.PI / 10);
       }
+
       if(myScene.keysDown[key.d]) { // if d
         myScene.camera.vector.rotateHorizontally(-Math.PI / 16);
       }
@@ -55,12 +56,6 @@
 
       render();
     }
-
-    // document.moveAbsoluteEventListener("mousemove", logMouse);
-    //
-    // function logMouse(e){
-    //   console.log(e);
-    // }
 
     var fps = myScene.framerate;
     setInterval(update, 1000 / fps);

@@ -151,13 +151,14 @@ var ModelTemplates = {
   }
 }
 
-var Camera = function(position, vector, viewportSize, zoom){
+var Camera = function(position, vector, viewportSize, zoom, sensitivity){
   this.position = position;
   this.vector = vector;
   this.viewportSize = viewportSize;
   this.zoom = zoom;
+  this.sensitivity = sensitivity;
   if(this.vector.y != 0){
-    throw "Rotation only around Y axis is implemented so, only horizontal vectors allowed for the camera";
+    throw "Rotation only around Y axis is implemented, so only horizontal vectors allowed for the camera";
   }
 
   //when I check if the polygon is in view, i can avoid redoing the claculations by putting the results in here
@@ -212,7 +213,7 @@ var Scene = function(canvasId){
   this.canvas = document.getElementById(canvasId);
   this.ctx = this.canvas.getContext("2d");
   this.zoom = 600;
-  this.camera = new Camera(new Vertex(0, 0, 0), new Vector(0, 0, 1), [this.canvas.width, this.canvas.height], this.zoom);
+  this.camera = new Camera(new Vertex(0, 0, 0), new Vector(0, 0, 1), [this.canvas.width, this.canvas.height], this.zoom, .5);
   this.defaultFillStyle = 'black';
   this.defaultStrokeStyle = 'black';
   this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
@@ -221,6 +222,7 @@ var Scene = function(canvasId){
   this.ctx.strokeStyle = this.defaultStrokeStyle;
 
   this.keysDown = null;
+  this.mouseCoords = null;
   this.mouseEvents = null;
   enableKeyboardEvents(this);
   enableMouseEvents(this);
@@ -290,29 +292,30 @@ function enableKeyboardEvents(scene){
 //push mouseCoords onto this 'queue' with mousemove events, as events get used they will get shifted off
 
 function enableMouseEvents(scene){
+  scene.mouseCoords = {x:scene.canvas.width / 2, y: scene.canvas.height / 2};
   scene.mouseEvents = [];
   var canvasBounds = scene.canvas.getBoundingClientRect();
   var widthRatio = scene.canvas.width / canvasBounds.width;
   var heightRatio = scene.canvas.height / canvasBounds.height;
 
   document.onmousemove = function(e){
-    //left = 1, right = 2, middle = 4;
-    //if left button click included in all other clicks
-    //if(e.buttons % 2 == 1){
-    //restrict pushing to this 'stack' if it get's overloaded
-      if(scene.mouseEvents.length < 20){
-        var x = (e.clientX - canvasBounds.left) * widthRatio;
-        var y = (e.clientY - canvasBounds.top) * heightRatio;
-        //when elements get shifted off, I want it to be like a queue instead of a stack
-        if(y >= 0 && y < 500)
-          scene.mouseEvents.push({x, y}); //temp fix to not having control of mouse
-      }
-    //}
+    var x = (e.clientX - canvasBounds.left) * widthRatio;
+    var y = (e.clientY - canvasBounds.top) * heightRatio;
+
+    scene.mouseCoords = {x, y};
+    //when elements get shifted off, I want it to be like a queue instead of a stack
+    if(scene.mouseEvents.length < 20){
+      scene.mouseEvents.push({x, y});
+    }
   }
 }
 
+var LookThreshold = {
+  Weak: 100, Med: 50
+}
+
 var MouseHelper = {
-  //TODO: need to save the lastest mousePosition and use it
+
   //get the difference from the earliest
   popDisplacement: function(scene){
     //there's no difference between elements if there is only 1 element
@@ -336,6 +339,40 @@ var MouseHelper = {
       scene.mouseEvents = [scene.mouseEvents[scene.mouseEvents.length - 1]];
       scene.mouseEvents = [];
       return({dX, dY});
+    }
+  },
+
+  GetLookLeftScalar: function(scene){
+    var x = scene.mouseCoords.x;
+    if(x < 0)
+      return(1 * scene.camera.sensitivity); //strong
+    else if(x < LookThreshold.Med)
+      return(.5 * scene.camera.sensitivity); //med
+    else if(x < LookThreshold.Weak)
+      return(.25 * scene.camera.sensitivity); //weak
+    else
+      return(0);  //none
+  },
+
+  GetLookRightScalar: function(scene){
+    var x = scene.mouseCoords.x;
+    if(x > scene.canvas.width)
+      return(1 * scene.camera.sensitivity); //strong
+    else if(x > scene.canvas.width - LookThreshold.Med)
+      return(.5 * scene.camera.sensitivity); //medium
+    else if (x > scene.canvas.width - LookThreshold.Weak)
+      return(.25 * scene.camera.sensitivity); //weak
+    else
+      return(0); //none
+  },
+
+  GetLookHorizontalScalar: function(scene){
+    var lookLeftScalar = MouseHelper.GetLookLeftScalar(scene);
+    if(lookLeftScalar != 0){
+      return -1 * lookLeftScalar;
+    }
+    else{
+      return MouseHelper.GetLookRightScalar(scene);
     }
   }
 }
