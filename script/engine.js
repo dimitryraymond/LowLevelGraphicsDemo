@@ -239,7 +239,7 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
 
   this.updateMotion = function(scene){
     var lookHorizontalScalar = MouseHelper.GetLookHorizontalScalar(scene);
-    if(lookHorizontalScalar != 0){
+    if(lookHorizontalScalar != 0 && scene.mouseCoords.y > 0){
       this.vector.rotateHorizontally(-1 * lookHorizontalScalar * Math.PI / 15);
     }
 
