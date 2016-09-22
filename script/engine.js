@@ -54,6 +54,16 @@ var Vector = function(x, y, z){
     this.z = tempZ;
   }
 
+  this.rotateVertically = function(radians){
+    var tempX = this.x;
+    var tempY = Math.sin(radians) * this.z + Math.cos(radians) * this.y;
+    var tempZ = Math.cos(radians) * this.z - Math.sin(radians) * this.y;
+
+    this.x = tempX;
+    this.y = tempY;
+    this.z = tempZ;
+  }
+
   this.getScaled = function(scallar){
     return new Vector(this.x * scallar, this.y * scallar, this.z * scallar);
   }
@@ -181,12 +191,19 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity){
       point.y -= this.position.y;
       point.z -= this.position.z;
 
+      //rotate right or left
       var tX = point.x * cos - point.z * sin;
+      var tY = point.y;
       var tZ = point.x * sin + point.z * cos;
+
+      //rotate up or down
+      tX = tX;
+      tY = point.z * sin + point.y * cos;
+      //tZ = point.z * cos - point.y * sin;
 
       //provides the depth
       var x = tZ == 0 ? tX : (tX * this.zoom) / (tZ + this.zoom)
-      var y = tZ == 0 ? point.y : (point.y * this.zoom) / (tZ + this.zoom);
+      var y = tZ == 0 ? tY : (tY * this.zoom) / (tZ + this.zoom);
 
       this.cashedVertices.push([x, -y]);
 
@@ -339,6 +356,40 @@ var MouseHelper = {
       scene.mouseEvents = [scene.mouseEvents[scene.mouseEvents.length - 1]];
       scene.mouseEvents = [];
       return({dX, dY});
+    }
+  },
+
+  GetLookUpScalar: function(scene){
+    var x = scene.mouseCoords.x;
+    if(x < 0)
+      return(1 * scene.camera.sensitivity); //strong
+    else if(x < LookThreshold.Med)
+      return(.5 * scene.camera.sensitivity); //med
+    else if(x < LookThreshold.Weak)
+      return(.25 * scene.camera.sensitivity); //weak
+    else
+      return(0);  //none
+  },
+
+  GetLookDownScalar: function(scene){
+    var x = scene.mouseCoords.x;
+    if(x > scene.canvas.width)
+      return(1 * scene.camera.sensitivity); //strong
+    else if(x > scene.canvas.width - LookThreshold.Med)
+      return(.5 * scene.camera.sensitivity); //medium
+    else if (x > scene.canvas.width - LookThreshold.Weak)
+      return(.25 * scene.camera.sensitivity); //weak
+    else
+      return(0); //none
+  },
+
+  GetLookVerticalScalar: function(scene){
+    var lookUpScalar = MouseHelper.GetLookUpScalar(scene);
+    if(lookUpScalar != 0){
+      return -1 * lookUpScalar;
+    }
+    else{
+      return MouseHelper.GetLookDownScalar(scene);
     }
   },
 
