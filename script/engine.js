@@ -206,16 +206,26 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity){
       var x = tZ == 0 ? tX : (tX * this.zoom) / (tZ + this.zoom)
       var y = tZ == 0 ? point.y : (point.y * this.zoom) / (tZ + this.zoom);
 
-      this.cashedVertices.push([x, -y]);
+      //from 0 to 1 | 0 = 2D, 1 = 3D, > 1 = nonsense
+      var dimentionShift = 1; //holy shit, this might be a cool game mechanic when it goes above 1
+      if(dimentionShift == 1)
+        this.cashedVertices.push([x, -y]);
+      else
+        this.cashedVertices.push([x * dimentionShift + point.x * (1 - dimentionShift), -(y * dimentionShift + point.y * (1 - dimentionShift))]);
 
       //it checks if the vertex z coord is in front of the camera
       if(tZ > 0){
-        //occlusion culling TODO: does canvas already do this? I noticed no difference
-        if(x > viewportSize[0] / 2 || x < -viewportSize[0] / 2){
-          //point is too far to the side
-        }
-        else if(y > viewportSize[1] / 2 || y < -viewportSize[1] / 2){
-          //point is too far high or low
+        if(dimentionShift == 1){
+          //occlusion culling TODO: does canvas already do this? I noticed no difference
+          if(x > viewportSize[0] / 2 || x < -viewportSize[0] / 2){
+            //point is too far to the side
+          }
+          else if(y > viewportSize[1] / 2 || y < -viewportSize[1] / 2){
+            //point is too far high or low
+          }
+          else{
+            anyVertexVisible = true;
+          }
         }
         else{
           anyVertexVisible = true;
