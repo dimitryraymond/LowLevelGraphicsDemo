@@ -36,10 +36,10 @@
       }
 
       if(myScene.keysDown[key.d]) { // if d
-        myScene.camera.vector.rotateHorizontally(-Math.PI / 16);
+        myScene.camera.position.shiftHorizontalRelativeToVector(myScene.camera.vector, speed);
       }
       if(myScene.keysDown[key.a]) { // if a
-        myScene.camera.vector.rotateHorizontally(Math.PI / 16);
+        myScene.camera.position.shiftHorizontalRelativeToVector(myScene.camera.vector, -speed);
       }
       if(myScene.keysDown[key.w]){ // if w
         myScene.camera.position.moveAbsolute(myScene.camera.vector.toVertex().getScaled(speed));

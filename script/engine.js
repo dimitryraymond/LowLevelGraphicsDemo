@@ -3,14 +3,19 @@ var Vertex = function(x, y, z){
   this.y = y;
   this.z = z;
 
+  this.getScaled = function(scallar){
+    return new Vertex(this.x * scallar, this.y * scallar, this.z * scallar);
+  }
+
   this.moveAbsolute = function(vertex){
     this.x += vertex.x;
     this.y += vertex.y;
     this.z += vertex.z;
   }
 
-  this.getScaled = function(scallar){
-    return new Vertex(this.x * scallar, this.y * scallar, this.z * scallar);
+  this.shiftHorizontalRelativeToVector = function(vector, x){
+    this.x -= (vector.z * -x);
+    this.z += (vector.x * -x);
   }
 }
 
