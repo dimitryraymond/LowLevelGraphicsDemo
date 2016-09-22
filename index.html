@@ -13,18 +13,20 @@
 
     var myScene = new Scene('myScene');
 
-    var floor = ModelTemplates.tiledFloor(-1000, -1000, 2000, 2000, 40, ['black', 'blue'])
-    floor.position = new Vertex(0, -250, 0);
+    var floorPolygons = ModelTemplates.tiledFloor(-1000, -1000, 2000, 2000, 40, ['black', 'blue'])
+    var floor = new Model(floorPolygons, new Vertex(0, -250, 0));
 
-    var box = ModelTemplates.box(0, 0, 0, 100, 200, 400, 'rgba(255, 0, 255, .2)');
-    box.position = new Vertex(100, 100, 500);
-    box.velocity = new Vertex(0, 50, 25);
-    box.HasGravityEnabled = true;
+    var boxPolygons = ModelTemplates.box(0, 0, 0, 100, 200, 400, 'rgba(255, 0, 255, .2)');
+    var box = new Model(boxPolygons, new Vertex(100, 100, 500), null, new Vertex(0, 70, 25), true);
+    var box2 = new Model(boxPolygons, new Vertex(-300, 10, 2000), null, new Vertex(50, 50, -50), true);
+    var box3 = new Model(boxPolygons, new Vertex(-100, 50, 500), null, null, false);
 
     function render(){
       myScene.clearScreen();
       myScene.renderModel(floor);
       myScene.renderModel(box);
+      myScene.renderModel(box2);
+      myScene.renderModel(box3);
     }
 
     render(); //this keeps the screen from flashing/loading
@@ -33,6 +35,9 @@
     var update = function() {
       myScene.camera.updateMotion(myScene);
       box.update(fps);
+      box2.update(fps);
+      box3.update(fps);
+      console.log(box.position.y);
       render();
     }
 

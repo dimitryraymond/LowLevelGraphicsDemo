@@ -68,12 +68,12 @@ var Vector = function(x, y, z){
   }
 }
 
-var Model = function(polygons, position, direction, velocity){
+var Model = function(polygons, position, direction, velocity, gravityEnabled){
   this.polygons = polygons ? polygons : [];
   this.direction = direction ? direction : new Vector(0, 0, 1);
   this.position = position ? position : new Vertex(0, 0, 0);
   this.velocity = velocity ? velocity : new Vertex(0, 0, 0);
-  this.HasGravityEnabled = false;
+  this.HasGravityEnabled = gravityEnabled;
 
   this.update = function(fps){
     //update motion
@@ -92,7 +92,7 @@ var ModelTemplates = {
     var tileSize = tileSize ? tileSize : 100;
     var colors = colors ? colors : ['red', 'black'];
     var y = 0;
-    var floor = new Model();
+    var floorPolygons = [];
     var tileCountX = Math.floor(width / tileSize);
     var tileCountZ = Math.floor(length / tileSize);
 
@@ -108,16 +108,16 @@ var ModelTemplates = {
           polygon.color = colors[0];
         else
           polygon.color = colors[1];
-        floor.polygons.push(polygon);
+        floorPolygons.push(polygon);
       }
     }
 
-    return floor;
+    return floorPolygons;
   },
   box: function(x, y, z, width, height, depth, color){
-    var box = new Model();
+    var boxPolygons = [];
     //back
-    box.polygons.push(new Polygon(
+    boxPolygons.push(new Polygon(
       [new Vertex(x, y, z + depth),
       new Vertex(x + width, y, z + depth),
       new Vertex(x + width, y + height, z + depth),
@@ -125,7 +125,7 @@ var ModelTemplates = {
       'rgba(0, 0, 0, .4)' //need to hardcode other color to be sure my rendering is done correctly
     ));
     //right
-    box.polygons.push(new Polygon(
+    boxPolygons.push(new Polygon(
       [new Vertex(x + width, y, z),
       new Vertex(x + width, y, z + depth),
       new Vertex(x + width, y + height, z + depth),
@@ -133,7 +133,7 @@ var ModelTemplates = {
       'rgba(255, 0, 0, .2)' //need to hardcode other color to be sure my rendering is done correctly
     ));
     //top
-    box.polygons.push(new Polygon(
+    boxPolygons.push(new Polygon(
       [new Vertex(x, y + height, z),
       new Vertex(x + width, y + height, z),
       new Vertex(x + width, y + height, z + depth),
@@ -141,7 +141,7 @@ var ModelTemplates = {
       'rgba(0, 255, 255, .2)' //need to hardcode other color to be sure my rendering is done correctly
     ));
     //bottom
-    box.polygons.push(new Polygon(
+    boxPolygons.push(new Polygon(
       [new Vertex(x, y, z),
       new Vertex(x + width, y, z),
       new Vertex(x + width, y, z + depth),
@@ -149,7 +149,7 @@ var ModelTemplates = {
       'rgba(127, 127, 255, .2)' //need to hardcode other color to be sure my rendering is done correctly
     ));
     //left
-    box.polygons.push(new Polygon(
+    boxPolygons.push(new Polygon(
       [new Vertex(x, y, z + depth),
       new Vertex(x, y, z),
       new Vertex(x, y + height, z),
@@ -157,14 +157,14 @@ var ModelTemplates = {
       'rgba(0, 255, 0, .2)' //need to hardcode other color to be sure my rendering is done correctly
     ));
     //front
-    box.polygons.push(new Polygon(
+    boxPolygons.push(new Polygon(
       [new Vertex(x, y, z),
       new Vertex(x + width, y, z),
       new Vertex(x + width, y + height, z),
       new Vertex(x, y + height, z)],
       color
     ));
-    return box;
+    return boxPolygons;
   }
 }
 
