@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="css/main.css" />
 </head>
 <body>
-
+  2D <input type='range' id='dimentionSlider' max='10' min='0' value='10' step='1'/> 3D
   <canvas id='myScene' width="1000" height="500">no canvas?</canvas>
   <script src="script/engine.js" /></script>
   <script>
@@ -37,7 +37,6 @@
       box.update(fps);
       box2.update(fps);
       box3.update(fps);
-      console.log(box.position.y);
       render();
     }
 

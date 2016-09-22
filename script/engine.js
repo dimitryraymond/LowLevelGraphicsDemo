@@ -168,7 +168,7 @@ var ModelTemplates = {
   }
 }
 
-var Camera = function(position, vector, viewportSize, zoom, sensitivity){
+var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
   this.position = position;
   this.vector = vector;
   this.viewportSize = viewportSize;
@@ -199,19 +199,21 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity){
       point.y -= this.position.y;
       point.z -= this.position.z;
 
+      //point is rotated relative to camera
       var tX = point.x * cos - point.z * sin;
+      var tY = point.y;
       var tZ = point.x * sin + point.z * cos;
 
-      //provides the depth
+      //provides depth perception
       var x = tZ == 0 ? tX : (tX * this.zoom) / (tZ + this.zoom)
       var y = tZ == 0 ? point.y : (point.y * this.zoom) / (tZ + this.zoom);
 
       //from 0 to 1 | 0 = 2D, 1 = 3D, > 1 = nonsense
-      var dimentionShift = 1; //holy shit, this might be a cool game mechanic when it goes above 1
+      var dimentionShift = scene.dimentionShift;
       if(dimentionShift == 1)
         this.cashedVertices.push([x, -y]);
       else
-        this.cashedVertices.push([x * dimentionShift + point.x * (1 - dimentionShift), -(y * dimentionShift + point.y * (1 - dimentionShift))]);
+        this.cashedVertices.push([x * dimentionShift + tX * (1 - dimentionShift), -(y * dimentionShift + tY * (1 - dimentionShift))]);
 
       //it checks if the vertex z coord is in front of the camera
       if(tZ > 0){
@@ -267,7 +269,7 @@ var Scene = function(canvasId){
   this.canvas = document.getElementById(canvasId);
   this.ctx = this.canvas.getContext("2d");
   this.zoom = 600;
-  this.camera = new Camera(new Vertex(0, 0, 0), new Vector(0, 0, 1), [this.canvas.width, this.canvas.height], this.zoom, .5);
+  this.camera = new Camera(new Vertex(0, 0, 0), new Vector(0, 0, 1), [this.canvas.width, this.canvas.height], this.zoom, .5, this);
   this.defaultFillStyle = 'black';
   this.defaultStrokeStyle = 'black';
   this.ctx.translate(this.canvas.width / 2, this.canvas.height / 2);
@@ -276,10 +278,14 @@ var Scene = function(canvasId){
   this.ctx.strokeStyle = this.defaultStrokeStyle;
 
   this.keysDown = null;
+  enableKeyboardEvents(this);
+
   this.mouseCoords = null;
   this.mouseEvents = null;
-  enableKeyboardEvents(this);
   enableMouseEvents(this);
+
+  this.dimentionShift = 1;
+  enableDimentionSlider(this);
 
   this.draw3DPolygon = function(polygon){
     if(this.camera.polygonInView(polygon)){
@@ -334,6 +340,13 @@ var LookThreshold = {
 
 var GRAVITY = -90;
 
+function enableDimentionSlider(scene){
+  var slider = document.getElementById('dimentionSlider');
+  slider.onchange = function(){
+    scene.dimentionShift = parseInt(slider.value) / 10;
+  }
+}
+
 function enableKeyboardEvents(scene){
   scene.keysDown = new Array(256);
   for(var i = 0; i < 256; i++){
@@ -350,7 +363,6 @@ function enableKeyboardEvents(scene){
 }
 
 //push mouseCoords onto this 'queue' with mousemove events, as events get used they will get shifted off
-
 function enableMouseEvents(scene){
   scene.mouseCoords = {x:scene.canvas.width / 2, y: scene.canvas.height / 2};
   scene.mouseEvents = [];
