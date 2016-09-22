@@ -9,10 +9,8 @@ body {
   padding-top: 2%;
   padding-left: 6%;
   padding-right: 6%;
-  /*hide cursor*/
-  /*cursor: none;*/
 }
-#myCanvas{
+#myScene{
   width: 100%;
   margin: auto auto;
   background-color: white;
