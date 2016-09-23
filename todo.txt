@@ -1,0 +1,1 @@
+Feature: create slider to go from 2d to 3d -> (2D * slider + 3D * (1 - slider) | 0 <= slider <= 1)
