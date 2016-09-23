@@ -74,8 +74,13 @@ var Model = function(polygons, position, direction, velocity, gravityEnabled){
   this.position = position ? position : new Vertex(0, 0, 0);
   this.velocity = velocity ? velocity : new Vertex(0, 0, 0);
   this.HasGravityEnabled = gravityEnabled;
+  this.IsActive = true;
 
-  this.update = function(fps){
+  this.update = function(fps_){
+    var fps = fps_ ? fps_ : 30; // in case I forget
+    if(!this.IsActive)
+      return;
+
     //update motion
     this.position.x += this.velocity.x;
     this.position.y += this.velocity.y;
@@ -83,10 +88,18 @@ var Model = function(polygons, position, direction, velocity, gravityEnabled){
 
     if(this.HasGravityEnabled)
       this.velocity.y += (GRAVITY / fps);
+
+    if(this.position.x > OUT_OF_BOUNDS || this.position.x < -1 * OUT_OF_BOUNDS ||
+      this.position.y > OUT_OF_BOUNDS || this.position.y < -1 * OUT_OF_BOUNDS ||
+      this.position.z > OUT_OF_BOUNDS || this.position.z < -1 * OUT_OF_BOUNDS)
+    {
+        this.IsActive = false;
+        console.log(this + ": deactivated");
+    }
   }
 }
 
-var ModelTemplates = {
+var PolygonTemplates = {
   //tileSize and colors are optional
   tiledFloor: function(startX, startZ, width, length, tileSize, colors){
     var tileSize = tileSize ? tileSize : 100;
@@ -174,9 +187,9 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
   this.viewportSize = viewportSize;
   this.zoom = zoom;
   this.sensitivity = sensitivity;
-  this.speed = 50;
+  this.speed = 1500;
   if(this.vector.y != 0){
-    throw "Rotation only around Y axis is implemented, so only horizontal vectors allowed for the camera";
+    throw "Rotation only around Y axis is implemented, so only horizontal vectors allowed for the ";
   }
 
   //when I check if the polygon is in view, i can avoid redoing the claculations by putting the results in here
@@ -240,28 +253,28 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     }
 
     if(scene.keysDown[key.d]) { // if d
-      this.position.shiftHorizontalRelativeToVector(this.vector, this.speed);
+      this.position.shiftHorizontalRelativeToVector(this.vector, this.speed / scene.framerate);
     }
     if(scene.keysDown[key.a]) { // if a
-      this.position.shiftHorizontalRelativeToVector(this.vector, -this.speed);
+      this.position.shiftHorizontalRelativeToVector(this.vector, -this.speed / scene.framerate);
     }
     if(scene.keysDown[key.w]){ // if w
-      this.position.moveAbsolute(this.vector.toVertex().getScaled(this.speed));
+      this.position.moveAbsolute(this.vector.toVertex().getScaled(this.speed / scene.framerate));
     }
     if(scene.keysDown[key.s]){ // if s
-      this.position.moveAbsolute(this.vector.toVertex().getScaled(-this.speed));
+      this.position.moveAbsolute(this.vector.toVertex().getScaled(-this.speed / scene.framerate));
     }
     if(scene.keysDown[key.q]){ // if q
-      this.position.moveAbsolute(new Vertex(0, -this.speed, 0));
+      this.position.moveAbsolute(new Vertex(0, -this.speed / scene.framerate, 0));
     }
     if(scene.keysDown[key.e]){ // if e
-      this.position.moveAbsolute(new Vertex(0, this.speed, 0));
+      this.position.moveAbsolute(new Vertex(0, this.speed / scene.framerate, 0));
     }
   }
 }
 
 var Scene = function(canvasId){
-  this.framerate = 30;
+  this.framerate = 45;
   this.canvas = document.getElementById(canvasId);
   this.ctx = this.canvas.getContext("2d");
   this.zoom = 600;
@@ -335,6 +348,7 @@ var LookThreshold = {
 }
 
 var GRAVITY = -90;
+var OUT_OF_BOUNDS = 50000;
 
 function enableDimentionSlider(scene){
   var slider = document.getElementById('dimentionSlider');

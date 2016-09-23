@@ -13,20 +13,22 @@
 
     var myScene = new Scene('myScene');
 
-    var floorPolygons = ModelTemplates.tiledFloor(-1000, -1000, 2000, 2000, 40, ['black', 'blue'])
+    var floorPolygons = PolygonTemplates.tiledFloor(-1000, -1000, 2000, 2000, 200, ['black', 'blue'])
     var floor = new Model(floorPolygons, new Vertex(0, -250, 0));
 
-    var boxPolygons = ModelTemplates.box(0, 0, 0, 100, 200, 400, 'rgba(255, 0, 255, .2)');
-    var box = new Model(boxPolygons, new Vertex(100, 100, 500), null, new Vertex(0, 70, 25), true);
+    var boxPolygons = PolygonTemplates.box(0, 0, 0, 100, 200, 400, 'rgba(255, 0, 255, .2)');
+    var box1 = new Model(boxPolygons, new Vertex(100, 100, 500), null, new Vertex(0, 70, 25), true);
     var box2 = new Model(boxPolygons, new Vertex(-300, 10, 2000), null, new Vertex(50, 50, -50), true);
     var box3 = new Model(boxPolygons, new Vertex(-100, 50, 500), null, null, false);
+    var box4 = new Model([], new Vertex(-0, 10, 2000), null, new Vertex(50, 50, -50), true);
+
+    var models = [floor, box1, box2, box3, box4];
 
     function render(){
       myScene.clearScreen();
-      myScene.renderModel(floor);
-      myScene.renderModel(box);
-      myScene.renderModel(box2);
-      myScene.renderModel(box3);
+      for(var i = 0; i < models.length; i++){
+        myScene.renderModel(models[i]);
+      }
     }
 
     render(); //this keeps the screen from flashing/loading
@@ -34,9 +36,9 @@
     var fps = myScene.framerate;
     var update = function() {
       myScene.camera.updateMotion(myScene);
-      box.update(fps);
-      box2.update(fps);
-      box3.update(fps);
+      for(var i = 0; i < models.length; i++){
+        models[i].update(fps);
+      }
       render();
     }
 
