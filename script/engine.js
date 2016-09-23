@@ -24,6 +24,12 @@ var Polygon = function(vertices, color){
   this.color = color;
 }
 
+var Sphere = function(vertex, color, radius){
+  this.vertex = vertex;
+  this.color = color ? color : 'yellow';
+  this.radius = radius ? radius : 100;
+}
+
 var Vector = function(x, y, z){
   if(x == 0 && y == 0 && z == 0){
     throw "One of the coords must be non-zero";
@@ -68,12 +74,13 @@ var Vector = function(x, y, z){
   }
 }
 
-var Model = function(polygons, position, direction, velocity, gravityEnabled){
+var Model = function(polygons, spheres, position, direction, velocity, gravityEnabled){
   this.polygons = polygons ? polygons : [];
+  this.spheres = spheres ? spheres : [];
   this.direction = direction ? direction : new Vector(0, 0, 1);
   this.position = position ? position : new Vertex(0, 0, 0);
   this.velocity = velocity ? velocity : new Vertex(0, 0, 0);
-  this.HasGravityEnabled = gravityEnabled;
+  this.HasGravityEnabled = gravityEnabled ? gravityEnabled : false; //ternary here if input param is undefined
   this.IsActive = true;
 
   this.update = function(fps_){
@@ -93,8 +100,8 @@ var Model = function(polygons, position, direction, velocity, gravityEnabled){
       this.position.y > OUT_OF_BOUNDS || this.position.y < -1 * OUT_OF_BOUNDS ||
       this.position.z > OUT_OF_BOUNDS || this.position.z < -1 * OUT_OF_BOUNDS)
     {
-        this.IsActive = false;
-        console.log(this + ": deactivated");
+      this.IsActive = false;
+      console.log(this + ": deactivated");
     }
   }
 }
@@ -194,6 +201,8 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
 
   //when I check if the polygon is in view, i can avoid redoing the claculations by putting the results in here
   this.cashedVertices = [];
+  this.cashedSphereCoords = null;
+  this.cashedSphereRadius = null;
 
   this.polygonInView = function(polygon){
     //clear cache before this polygon gets processed
@@ -204,7 +213,7 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     var cos = this.vector.z / tLength;
 
     var anyVertexVisible = false;
-    for(var i = 0; i < polygon.vertices.length; i++){
+    for(var i = 0; i < polygon.vertices.length; i++){ // TODO: decouple vertice transformation and reuse for sphere coords
       var point = polygon.vertices[i];
 
       //camera position offset
@@ -246,6 +255,13 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     return anyVertexVisible;
   }
 
+  this.sphereInView = function(sphere){
+    this.cashedSphereCoords = null;
+    this.cashedSphereRadius = null;
+
+    // TODO: reuse coords transformation logic
+    return true;
+  }
   this.updateMotion = function(scene){
     var lookHorizontalScalar = MouseHelper.GetLookHorizontalScalar(scene);
     if(lookHorizontalScalar != 0 && scene.mouseCoords.y > 0){
@@ -293,8 +309,36 @@ var Scene = function(canvasId){
   this.mouseEvents = null;
   enableMouseEvents(this);
 
-  this.dimentionShift = 1;
+  this.dimentionShift = 1; //0 to 1 | from 2D to 3D
   enableDimentionSlider(this);
+
+  this.renderModel = function(model){
+    for(var i = 0; i < model.polygons.length; i++){
+      var polygon = new Polygon([], model.polygons[i].color);
+
+      //offset position of polygon's vertices relative to polygons parent model
+      for(var j = 0; j < model.polygons[i].vertices.length; j++){
+        var vertex = new Vertex(0, 0, 0);
+        vertex.x = model.polygons[i].vertices[j].x + model.position.x;
+        vertex.y = model.polygons[i].vertices[j].y + model.position.y;
+        vertex.z = model.polygons[i].vertices[j].z + model.position.z;
+        polygon.vertices.push(vertex);
+      }
+
+      this.draw3DPolygon(polygon);
+    }
+
+    //offset position of sphere's vertex relative to polygons parent model
+    for(var i = 0; i < model.spheres.length; i++){
+      var tVertex = new Vertex(0, 0, 0);
+      tVertex.x = model.spheres[i].vertex.x + model.position.x;
+      tVertex.y = model.spheres[i].vertex.y + model.position.y;
+      tVertex.z = model.spheres[i].vertex.z + model.position.z;
+      var sphere = new Sphere(tVertex, model.spheres[i].color, model.spheres[i].radius);
+
+      this.draw3DSphere(sphere);
+    }
+  }
 
   this.draw3DPolygon = function(polygon){
     if(this.camera.polygonInView(polygon)){
@@ -312,20 +356,18 @@ var Scene = function(canvasId){
     }
   }
 
-  this.renderModel = function(model){
-    for(var i = 0; i < model.polygons.length; i++){
-      var polygon = new Polygon([], model.polygons[i].color);
+  this.draw3DSphere = function(sphere){
+    if(this.camera.sphereInView(sphere)){ // TODO: implement
+      this.ctx.beginPath();
 
-      //offset position of polygon's vertices relative to polygons parent model
-      for(var j = 0; j < model.polygons[i].vertices.length; j++){
-        var vertex = new Vertex(0, 0, 0);
-        vertex.x = model.polygons[i].vertices[j].x + model.position.x;
-        vertex.y = model.polygons[i].vertices[j].y + model.position.y;
-        vertex.z = model.polygons[i].vertices[j].z + model.position.z;
-        polygon.vertices.push(vertex);
-      }
+      var coords = this.camera.cashedSphereCoords;
+      var radius = this.camera.cashedSphereRadius;
+      // TODO: actually draw sphere
 
-      this.draw3DPolygon(polygon);
+      this.ctx.closePath();
+
+      this.ctx.fillStyle = sphere.color;
+      this.ctx.fill();
     }
   }
 

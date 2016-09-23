@@ -13,16 +13,18 @@
 
     var myScene = new Scene('myScene');
 
-    var floorPolygons = PolygonTemplates.tiledFloor(-1000, -1000, 2000, 2000, 200, ['black', 'blue'])
-    var floor = new Model(floorPolygons, new Vertex(0, -250, 0));
+    var floorPolygons = PolygonTemplates.tiledFloor(-2000, -2000, 4000, 4000, 200, ['black', 'blue'])
+    var floor = new Model(floorPolygons, null, new Vertex(0, -250, 0));
 
     var boxPolygons = PolygonTemplates.box(0, 0, 0, 100, 200, 400, 'rgba(255, 0, 255, .2)');
-    var box1 = new Model(boxPolygons, new Vertex(100, 100, 500), null, new Vertex(0, 70, 25), true);
-    var box2 = new Model(boxPolygons, new Vertex(-300, 10, 2000), null, new Vertex(50, 50, -50), true);
-    var box3 = new Model(boxPolygons, new Vertex(-100, 50, 500), null, null, false);
-    var box4 = new Model([], new Vertex(-0, 10, 2000), null, new Vertex(50, 50, -50), true);
+    var box1 = new Model(boxPolygons, null, new Vertex(100, 100, 500), null, new Vertex(0, 70, 25), true);
+    var box2 = new Model(boxPolygons, null, new Vertex(-300, 10, 2000), null, new Vertex(50, 50, -50), true);
+    var box3 = new Model(boxPolygons, null, new Vertex(-100, 50, 500));
 
-    var models = [floor, box1, box2, box3, box4];
+    var sphereTemplate = [new Sphere(new Vertex(0, 0, 0))];
+    var sphere1 = new Model(null, sphereTemplate, new Vertex(0, 50, 300));
+
+    var models = [floor, box1, box2, box3, sphere1];
 
     function render(){
       myScene.clearScreen();
