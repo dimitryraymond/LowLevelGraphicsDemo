@@ -249,7 +249,6 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     //from 0 to 1 | 0 = 2D, 1 = 3D, > 1 = nonsense
     var dimentionShift = scene.dimentionShift;
 
-
     var tX = threeDVertex.x;
     var tY = threeDVertex.y;
     var tZ = threeDVertex.z;
@@ -314,7 +313,9 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     var finalVertex = this.applyDimentionShift(tVertex, twoDVertex);
 
     this.cashedSphereCoords = finalVertex;
-    this.cashedSphereRadius = 50;
+    var z = tVertex[2];
+    this.cashedSphereRadius = z == 0 ? sphere.radius : (sphere.radius * this.zoom) / (z + this.zoom);
+    
     return true;
   }
   this.updateMotion = function(scene){
