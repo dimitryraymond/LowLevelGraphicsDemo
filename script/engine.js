@@ -256,7 +256,7 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     var x = twoDVertex[0];
     var y = twoDVertex[1];
 
-    if(tZ > 0){
+
       if(dimentionShift == 1){
         //occlusion culling TODO: does canvas already do this? I noticed no difference
         if(x > viewportSize[0] / 2 || x < -viewportSize[0] / 2){} //point is too far to the side
@@ -264,16 +264,15 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
         else{
           this.anyVertexVisible = true;
         }
+        return([x, y]);
       }
       else{
         this.anyVertexVisible = true;
+        return([x * dimentionShift + tX * (1 - dimentionShift), y * dimentionShift + tY * (1 - dimentionShift)]);
       }
-    }
 
-    if(dimentionShift == 1)
-      return([x, y]);
-    else
-      return([x * dimentionShift + tX * (1 - dimentionShift), y * dimentionShift + tY * (1 - dimentionShift)]);
+
+
   }
 
   this.polygonInView = function(polygon){
