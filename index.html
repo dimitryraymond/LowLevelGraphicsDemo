@@ -6,7 +6,9 @@
   <link rel="stylesheet" type="text/css" href="css/main.css" />
 </head>
 <body>
-  2D <input type='range' id='dimentionSlider' max='10' min='0' value='10' step='1'/> 3D
+  <div id="dimentionSliderDiv">
+    2D <input type='range' id='dimentionSlider' max='10' min='0' value='10' step='1'/> 3D
+  </div>
   <canvas id='myScene' width="1000" height="500">no canvas?</canvas>
   <script src="script/engine.js" /></script>
   <script>
@@ -15,6 +17,7 @@
 
     var floorPolygons = PolygonTemplates.tiledFloor(-2000, -2000, 4000, 4000, 200, ['black', 'blue'])
     var floor = new Model(floorPolygons, null, new Vertex(0, -250, 0));
+    floor.IsActive = true;
 
     var boxPolygons = PolygonTemplates.box(0, 0, 0, 100, 200, 400, 'rgba(255, 0, 255, .2)');
     var box1 = new Model(boxPolygons, null, new Vertex(100, 100, 500), null, new Vertex(0, 70, 25), true);
@@ -22,9 +25,8 @@
     var box3 = new Model(boxPolygons, null, new Vertex(-100, 50, 500));
 
     var sphereTemplate = [new Sphere(new Vertex(0, 0, 0))];
-    var sphere1 = new Model(null, sphereTemplate, new Vertex(0, 50, 300), null, new Vertex(0, 50, 100), true);
 
-    var models = [floor, box1, box2, box3, sphere1];
+    var models = [floor, box1, box2, box3];
 
     function render(){
       myScene.clearScreen();
@@ -44,7 +46,34 @@
       render();
     }
 
+    var machineGun = function(event){
+      if(event.button == 2)
+        return false;
+      var position = new Vertex(0, 0, 0);
+      position.x = myScene.camera.position.x;
+      position.y = myScene.camera.position.y;
+      position.z = myScene.camera.position.z;
+
+      var velocity = myScene.camera.vector.toVertex().getScaled(1000);
+      velocity.y = 20;
+
+      var sphereX = new Model(null, sphereTemplate, position, null, velocity, true)
+      models.push(sphereX);
+    }
+
+    var collectDeadObjects = function(){
+      for(var i = models.length - 1; i > -1; i--){
+        if(!models[i].IsActive){
+          console.log(models[i] + ": deleted");
+          models.splice(i, 1);
+        }
+      }
+    }
+
     setInterval(update, 1000 / fps);
+    setInterval(collectDeadObjects, 2);
+
+    myScene.canvas.addEventListener("mousedown", machineGun);
 
   </script>
 </body>

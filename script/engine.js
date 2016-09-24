@@ -315,8 +315,12 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     this.cashedSphereCoords = finalVertex;
     var z = tVertex[2];
     this.cashedSphereRadius = z == 0 ? sphere.radius : (sphere.radius * this.zoom) / (z + this.zoom);
-    
-    return true;
+
+    //hotfix to error
+    if(this.cashedSphereRadius < 1)
+      return false;
+
+    return this.anyVertexVisible;
   }
   this.updateMotion = function(scene){
     var lookHorizontalScalar = MouseHelper.GetLookHorizontalScalar(scene);
@@ -413,11 +417,12 @@ var Scene = function(canvasId){
   }
 
   this.draw3DSphere = function(sphere){
-    if(this.camera.sphereInView(sphere)){ // TODO: implement
-      this.ctx.beginPath();
+    if(this.camera.sphereInView(sphere)){
 
       var coords = this.camera.cashedSphereCoords;
       var radius = this.camera.cashedSphereRadius;
+
+      this.ctx.beginPath();
       this.ctx.arc(coords[0], coords[1], radius, 0, 2 * Math.PI, false);
       this.ctx.closePath();
 
