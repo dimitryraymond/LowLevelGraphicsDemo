@@ -203,63 +203,105 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
   this.cashedVertices = [];
   this.cashedSphereCoords = null;
   this.cashedSphereRadius = null;
+  this.anyVertexVisible = false;
+
+  this.offsetToCamera = function(vertex){
+    var point = vertex;
+
+    //camera rotation
+    var sin = this.vector.x / 1;
+    var cos = this.vector.z / 1;
+
+    //camera position offset
+    point.x -= this.position.x;
+    point.y -= this.position.y;
+    point.z -= this.position.z;
+
+    //point is rotated relative to camera
+    var tX = point.x * cos - point.z * sin;
+    var tY = point.y;
+    var tZ = point.x * sin + point.z * cos;
+
+    return([tX, tY, tZ]);
+
+  }
+
+  this.applyDepthPerception = function(coords){
+    var tX = coords[0];
+    var tY = coords[1];
+    var tZ = coords[2];
+
+    //provides depth perception
+    var x = tZ == 0 ? tX : (tX * this.zoom) / (tZ + this.zoom)
+    var y = tZ == 0 ? tY : (tY * this.zoom) / (tZ + this.zoom);
+
+    //it checks if the vertex z coord is in front of the camera
+
+    if(tZ > 0){
+      this.anyVertexVisible = true;
+    }
+
+    //-y because canvas still has y inverted
+    return([x, -y]);
+  }
+
+  this.applyDimentionShift = function(threeDVertex, twoDVertex){
+    //from 0 to 1 | 0 = 2D, 1 = 3D, > 1 = nonsense
+    var dimentionShift = scene.dimentionShift;
+
+    var tX = threeDVertex.x;
+    var tY = threeDVertex.y;
+    var tZ = threeDVertex.z;
+
+    var x = twoDVertex[0];
+    var y = twoDVertex[1];
+
+    if(tZ > 0){
+      if(dimentionShift == 1){
+        //occlusion culling TODO: does canvas already do this? I noticed no difference
+        if(x > viewportSize[0] / 2 || x < -viewportSize[0] / 2){} //point is too far to the side
+        else if(y > viewportSize[1] / 2 || y < -viewportSize[1] / 2){} //point is too high or low
+        else{
+          this.anyVertexVisible = true;
+        }
+      }
+      else{
+        this.anyVertexVisible = true;
+      }
+    }
+
+    if(dimentionShift == 1)
+      return([x, y]);
+    else
+      return([x * dimentionShift + tX * (1 - dimentionShift), y * dimentionShift + tY * (1 - dimentionShift)]);
+  }
 
   this.polygonInView = function(polygon){
     //clear cache before this polygon gets processed
     this.cashedVertices = [];
 
-    var tLength = this.vector.length();
-    var sin = this.vector.x / tLength;
-    var cos = this.vector.z / tLength;
+    //HACK anyVertexVisible is getting changed inside offsetToCamera and applyDepthPerception function
+    this.anyVertexVisible = false;
 
-    var anyVertexVisible = false;
-    for(var i = 0; i < polygon.vertices.length; i++){ // TODO: decouple vertice transformation and reuse for sphere coords
-      var point = polygon.vertices[i];
-
-      //camera position offset
-      point.x -= this.position.x;
-      point.y -= this.position.y;
-      point.z -= this.position.z;
-
-      //point is rotated relative to camera
-      var tX = point.x * cos - point.z * sin;
-      var tY = point.y;
-      var tZ = point.x * sin + point.z * cos;
-
-      //provides depth perception
-      var x = tZ == 0 ? tX : (tX * this.zoom) / (tZ + this.zoom)
-      var y = tZ == 0 ? point.y : (point.y * this.zoom) / (tZ + this.zoom);
-
-      //from 0 to 1 | 0 = 2D, 1 = 3D, > 1 = nonsense
-      var dimentionShift = scene.dimentionShift;
-      if(dimentionShift == 1)
-        this.cashedVertices.push([x, -y]);
-      else
-        this.cashedVertices.push([x * dimentionShift + tX * (1 - dimentionShift), -(y * dimentionShift + tY * (1 - dimentionShift))]);
-
-      //it checks if the vertex z coord is in front of the camera
-      if(tZ > 0){
-        if(dimentionShift == 1){
-          //occlusion culling TODO: does canvas already do this? I noticed no difference
-          if(x > viewportSize[0] / 2 || x < -viewportSize[0] / 2){} //point is too far to the side
-          else if(y > viewportSize[1] / 2 || y < -viewportSize[1] / 2){} //point is too high or low
-          else{
-            anyVertexVisible = true;
-          }
-        }
-        else{
-          anyVertexVisible = true;
-        }
-      }
+    for(var i = 0; i < polygon.vertices.length; i++){
+      var tVertex = this.offsetToCamera(polygon.vertices[i]);
+      var twoDVertex = this.applyDepthPerception(tVertex);
+      var finalVertex = this.applyDimentionShift(tVertex, twoDVertex);
+      this.cashedVertices.push(finalVertex);
     }
-    return anyVertexVisible;
+
+    return this.anyVertexVisible;
   }
 
   this.sphereInView = function(sphere){
     this.cashedSphereCoords = null;
     this.cashedSphereRadius = null;
 
-    // TODO: reuse coords transformation logic
+    var tVertex = this.offsetToCamera(sphere.vertex);
+    var twoDVertex = this.applyDepthPerception(tVertex);
+    var finalVertex = this.applyDimentionShift(tVertex, twoDVertex);
+    this.cashedSphereCoords = twoDVertex;
+    this.cashedSphereRadius = 50;
     return true;
   }
   this.updateMotion = function(scene){
@@ -362,8 +404,7 @@ var Scene = function(canvasId){
 
       var coords = this.camera.cashedSphereCoords;
       var radius = this.camera.cashedSphereRadius;
-      // TODO: actually draw sphere
-
+      this.ctx.arc(coords[0], coords[1], radius, 0, 2 * Math.PI, false);
       this.ctx.closePath();
 
       this.ctx.fillStyle = sphere.color;
