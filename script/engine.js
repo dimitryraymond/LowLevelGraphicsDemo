@@ -249,6 +249,7 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     //from 0 to 1 | 0 = 2D, 1 = 3D, > 1 = nonsense
     var dimentionShift = scene.dimentionShift;
 
+
     var tX = threeDVertex.x;
     var tY = threeDVertex.y;
     var tZ = threeDVertex.z;
@@ -256,7 +257,7 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     var x = twoDVertex[0];
     var y = twoDVertex[1];
 
-
+    if(tZ > 0){
       if(dimentionShift == 1){
         //occlusion culling TODO: does canvas already do this? I noticed no difference
         if(x > viewportSize[0] / 2 || x < -viewportSize[0] / 2){} //point is too far to the side
@@ -264,15 +265,26 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
         else{
           this.anyVertexVisible = true;
         }
-        return([x, y]);
       }
       else{
         this.anyVertexVisible = true;
-        return([x * dimentionShift + tX * (1 - dimentionShift), y * dimentionShift + tY * (1 - dimentionShift)]);
       }
+    }
 
+    var _x = null;
+    var _y = null;
 
+    if(dimentionShift == 1){
+      _x = x;
+      _y = y;
+    }
+    else{
+      _x = x * dimentionShift + tX * (1 - dimentionShift);
+      _y = y * dimentionShift + tY * (1 - dimentionShift);
+    }
 
+    //disabling dimentionshift cus I broke it
+    return ([x, y]);
   }
 
   this.polygonInView = function(polygon){
@@ -286,6 +298,7 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
       var tVertex = this.offsetToCamera(polygon.vertices[i]);
       var twoDVertex = this.applyDepthPerception(tVertex);
       var finalVertex = this.applyDimentionShift(tVertex, twoDVertex);
+
       this.cashedVertices.push(finalVertex);
     }
 
@@ -299,7 +312,8 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     var tVertex = this.offsetToCamera(sphere.vertex);
     var twoDVertex = this.applyDepthPerception(tVertex);
     var finalVertex = this.applyDimentionShift(tVertex, twoDVertex);
-    this.cashedSphereCoords = twoDVertex;
+
+    this.cashedSphereCoords = finalVertex;
     this.cashedSphereRadius = 50;
     return true;
   }
