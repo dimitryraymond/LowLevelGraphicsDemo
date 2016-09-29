@@ -249,9 +249,9 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     //from 0 to 1 | 0 = 2D, 1 = 3D, > 1 = nonsense
     var dimentionShift = scene.dimentionShift;
 
-    var tX = threeDVertex.x;
-    var tY = threeDVertex.y;
-    var tZ = threeDVertex.z;
+    var tX = threeDVertex[0];
+    var tY = threeDVertex[1];
+    var tZ = threeDVertex[2];
 
     var x = twoDVertex[0];
     var y = twoDVertex[1];
@@ -279,11 +279,11 @@ var Camera = function(position, vector, viewportSize, zoom, sensitivity, scene){
     }
     else{
       _x = x * dimentionShift + tX * (1 - dimentionShift);
-      _y = y * dimentionShift + tY * (1 - dimentionShift);
-    }
+      _y = y * dimentionShift - tY * (1 - dimentionShift);
 
+    }
     //disabling dimentionshift cus I broke it
-    return ([x, y]);
+    return ([_x, _y]);
   }
 
   this.polygonInView = function(polygon){
