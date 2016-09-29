@@ -5,7 +5,8 @@ Assignment in my Adv. Game Programming Class
 * S - Back
 * A - Slide Left
 * D - Slide Right
-* Q - Fall, E - Rise
+* Q - Fall
+* E - Rise
 * MouseRight - Look Right
 * MouseLeft - Look Left
 
